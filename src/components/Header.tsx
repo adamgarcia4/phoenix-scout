@@ -20,6 +20,13 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import InboxIcon from '@material-ui/icons/MoveToInbox'
 import MailIcon from '@material-ui/icons/Mail'
+import NoteAddIcon from '@material-ui/icons/NoteAdd'
+import HomeIcon from '@material-ui/icons/Home'
+
+import {
+  useHistory,
+  useLocation,
+} from 'react-router-dom'
 
 const drawerWidth = 240
 
@@ -82,6 +89,10 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 function PersistentDrawerLeft({ children }: {children: any}) {
   const classes = useStyles()
   const theme = useTheme()
+
+  const history = useHistory()
+  const location = useLocation()
+
   const [open, setOpen] = React.useState(false)
 
   const handleDrawerOpen = () => {
@@ -91,6 +102,13 @@ function PersistentDrawerLeft({ children }: {children: any}) {
   const handleDrawerClose = () => {
     setOpen(false)
   }
+
+  const navigateToPath = (path: string) => {
+    history.push(path)
+    handleDrawerClose()
+  }
+
+  const isPath = (path: string) => path === location.pathname
 
   return (
     <div className={classes.root}>
@@ -132,22 +150,34 @@ function PersistentDrawerLeft({ children }: {children: any}) {
         </div>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          <ListItem selected={isPath('/')} button onClick={() => navigateToPath('/')}>
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItem>
+          <ListItem selected={isPath('/add-match')} button onClick={() => navigateToPath('/add-match')}>
+            <ListItemIcon>
+              <NoteAddIcon />
+            </ListItemIcon>
+            <ListItemText primary="Add Match" />
+          </ListItem>
+          {/* {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />
             </ListItem>
-          ))}
+          ))} */}
         </List>
         <Divider />
-        <List>
+        {/* <List>
           {['All mail', 'Trash', 'Spam'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />
             </ListItem>
           ))}
-        </List>
+        </List> */}
       </Drawer>
       <main
         className={clsx(classes.content, {
