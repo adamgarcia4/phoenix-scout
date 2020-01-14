@@ -4,6 +4,9 @@ import { makeStyles, createStyles } from '@material-ui/core/styles'
 import firebase from 'firebase'
 import styled from 'styled-components'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import SaveIcon from '@material-ui/icons/Save'
+import Fab from '@material-ui/core/Fab'
+
 const NumberButton = styled.span`
   display: inline-block;
   vertical-align: middle;
@@ -30,6 +33,11 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   submitButton: {
     marginTop: '30px',
   },
+  saveFab: {
+    position: 'absolute',
+    right: theme.spacing(2),
+    bottom: theme.spacing(2),
+  },
 }))
 
 
@@ -37,6 +45,7 @@ export default function AddMatch() {
   const [numHigh, setNumHigh] = useState(0)
   const [numLow, setNumLow] = useState(0)
   const [count, setCount] = useState(0)
+  const [expanded, setExpanded] = useState<string | false>('panel1')
   const classes = useStyles()
 
   firebase.firestore().collection('matches').onSnapshot((docs) => {
@@ -53,6 +62,8 @@ export default function AddMatch() {
 
     setCount(count + 1)
   }
+
+  const isDirty = () => !(numHigh || numLow)
 
   const incrementFunction = (hookFunc: React.Dispatch<React.SetStateAction<number>>, newNum: number) => {
     if (newNum > -1) {
@@ -86,10 +97,15 @@ export default function AddMatch() {
     </>
   )
 
+  const handlePanelChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+    setExpanded(isExpanded ? panel : false)
+  }
+  
   return (
     <div className={classes.root}>
       <ExpansionPanel
-        defaultExpanded
+        expanded={expanded === 'panel1'}
+        onChange={handlePanelChange('panel1')}
       >
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
@@ -101,7 +117,7 @@ export default function AddMatch() {
         <ExpansionPanelDetails>
           <Box display="flex" flexDirection="column">
             <Typography>
-              Please Enter the auton details here!
+              Please record results of Auton Here!
             </Typography>
             <Box>
               {highBallSection()}
@@ -112,6 +128,35 @@ export default function AddMatch() {
           </Box>
         </ExpansionPanelDetails>
       </ExpansionPanel>
+      <ExpansionPanel
+        expanded={expanded === 'panel2'}
+        onChange={handlePanelChange('panel2')}
+      >
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography className={classes.heading}>Teleop Mode</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <Box display="flex" flexDirection="column">
+            <Typography>
+              Please record results of Teleop Here!
+            </Typography>
+            <Box>
+              {highBallSection()}
+            </Box>
+            <Box>
+              {lowBallSection()}
+            </Box>
+          </Box>
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+
+      <Fab color="primary" className={classes.saveFab} disabled={isDirty()}>
+        <SaveIcon />
+      </Fab>
     </div>
   )
 
