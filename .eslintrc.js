@@ -42,6 +42,7 @@ module.exports = {
         "ts": "never",
         "tsx": "never"
       }
-   ]
+   ],
+   "@typescript-eslint/no-unused-vars": [2]
   },
 };

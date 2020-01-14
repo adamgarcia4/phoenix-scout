@@ -1,11 +1,26 @@
 import React, { useState } from 'react'
-import { Button, Typography, Paper, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails, Theme, Box } from '@material-ui/core'
+import {
+  Button,
+  Typography,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails,
+  Box,
+  Theme,
+} from '@material-ui/core'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
-import firebase from 'firebase'
+import * as firebase from 'firebase/app'
+import 'firebase/firestore'
 import styled from 'styled-components'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Switch from '@material-ui/core/Switch'
+import {
+  useHistory,
+} from 'react-router-dom'
 
 const NumberButton = styled.span`
   display: inline-block;
@@ -40,136 +55,285 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }))
 
+const incrementOnPositive = (
+  hookFunc: Function,
+  newNum: number,
+) => {
+  if (newNum > -1) {
+    hookFunc(newNum)
+  }
+}
+
+interface BallCountSectionInterface {
+  title: string,
+  numBalls: number,
+  incrementFunction: Function
+}
+
+const BallCountSection = ({
+  title,
+  numBalls,
+  incrementFunction,
+}: BallCountSectionInterface) => (
+  <>
+    <Typography variant="h6">
+      {title}
+    </Typography>
+    <NumberButton>
+      {numBalls}
+    </NumberButton>
+    <Button variant="contained" color="primary" size="small" onClick={() => incrementOnPositive(incrementFunction, numBalls + 1)}>+</Button>
+    <Button variant="contained" color="secondary" size="small" onClick={() => incrementOnPositive(incrementFunction, numBalls - 1)}>-</Button>
+  </>
+)
+
+interface AutonModeProps {
+  expanded: any,
+  handlePanelChange: any,
+  numHigh: number,
+  setNumHigh: Function,
+  numLow: number,
+  setNumLow: Function,
+}
+
+const AutonMode = ({
+  expanded,
+  handlePanelChange,
+  numHigh,
+  setNumHigh,
+  numLow,
+  setNumLow,
+}: AutonModeProps) => {
+  const classes = useStyles()
+  return (
+    <ExpansionPanel
+      expanded={expanded === 'panel1'}
+      onChange={handlePanelChange('panel1')}
+    >
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Typography className={classes.heading}>Auton Mode</Typography>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <Box display="flex" flexDirection="column">
+          <Typography>
+                Please record results of Auton Here!
+          </Typography>
+          <Box>
+            <BallCountSection
+              title="High Balls"
+              numBalls={numHigh}
+              incrementFunction={setNumHigh}
+            />
+          </Box>
+          <Box>
+            <BallCountSection
+              title="Low Balls"
+              numBalls={numLow}
+              incrementFunction={setNumLow}
+            />
+          </Box>
+        </Box>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  )
+}
+
+interface TeleModeProps {
+  expanded: any,
+  handlePanelChange: any,
+  numHigh: number,
+  setNumHigh: Function,
+  numLow: number,
+  setNumLow: Function,
+  isColorWheel: boolean,
+  setIsColorWheel: Function,
+}
+
+const TeleMode = ({
+  expanded,
+  handlePanelChange,
+  numHigh,
+  setNumHigh,
+  numLow,
+  setNumLow,
+  isColorWheel,
+  setIsColorWheel,
+}: TeleModeProps) => {
+  const classes = useStyles()
+  return (
+    <ExpansionPanel
+      expanded={expanded === 'panel2'}
+      onChange={handlePanelChange('panel2')}
+    >
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Typography className={classes.heading}>Tele Mode</Typography>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <Box display="flex" flexDirection="column">
+          <Typography>
+                Please record results of Teleop Here!
+          </Typography>
+          <Box>
+            <BallCountSection
+              title="High Balls"
+              numBalls={numHigh}
+              incrementFunction={setNumHigh}
+            />
+          </Box>
+          <Box>
+            <BallCountSection
+              title="Low Balls"
+              numBalls={numLow}
+              incrementFunction={setNumLow}
+            />
+          </Box>
+
+          <Box>
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Switch checked={isColorWheel} onChange={() => setIsColorWheel(!isColorWheel)} value="checkedA" />
+                }
+                label="Color Wheel Engaged"
+              />
+            </FormGroup>
+          </Box>
+
+
+        </Box>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  )
+}
+
+interface EndGameModeProps {
+  expanded: any,
+  handlePanelChange: any,
+  didClimb: boolean,
+  setDidClimb: Function,
+}
+
+const EndGameMode = ({
+  expanded,
+  handlePanelChange,
+  didClimb,
+  setDidClimb,
+}: EndGameModeProps) => {
+  const classes = useStyles()
+  return (
+    <ExpansionPanel
+      expanded={expanded === 'panel3'}
+      onChange={handlePanelChange('panel3')}
+    >
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Typography className={classes.heading}>End Game</Typography>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <Box display="flex" flexDirection="column">
+          <Typography>
+                Please record results of the End Game!
+          </Typography>
+          <Box>
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Switch checked={didClimb} onChange={() => setDidClimb(!didClimb)} value="checkedA" />
+                }
+                label="Did they climb"
+              />
+            </FormGroup>
+          </Box>
+
+
+        </Box>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  )
+}
 
 export default function AddMatch() {
-  const [numHigh, setNumHigh] = useState(0)
-  const [numLow, setNumLow] = useState(0)
-  const [count, setCount] = useState(0)
+  const [numHighAuto, setNumHighAuto] = useState(0)
+  const [numLowAuto, setNumLowAuto] = useState(0)
+  const [numHighTele, setNumHighTele] = useState(0)
+  const [numLowTele, setNumLowTele] = useState(0)
+  const [isColorWheel, setIsColorWheel] = useState(false)
+  const [didClimb, setDidClimb] = useState(false)
+
+  const history = useHistory()
+
   const [expanded, setExpanded] = useState<string | false>('panel1')
   const classes = useStyles()
 
-  firebase.firestore().collection('matches').onSnapshot((docs) => {
-    docs.docs.map((doc) => {
-      console.log('doc:', doc.data())
-    })
-  })
-
   const submitMatch = () => {
     firebase.firestore().collection('matches').add({
-      numHigh: count,
-      numLow: count,
+      numHighAuto,
+      numLowAuto,
+      numHighTele,
+      numLowTele,
+      isColorWheel,
+      didClimb,
     })
 
-    setCount(count + 1)
+    history.push('/')
   }
 
-  const isDirty = () => !(numHigh || numLow)
-
-  const incrementFunction = (hookFunc: React.Dispatch<React.SetStateAction<number>>, newNum: number) => {
-    if (newNum > -1) {
-      hookFunc(newNum)
-    }
-  }
-
-  const highBallSection = () => (
-    <>
-      <Typography variant="h6">
-          Number High Balls
-      </Typography>
-      <NumberButton>
-        {numHigh}
-      </NumberButton>
-      <Button variant="contained" color="primary" size="small" onClick={() => incrementFunction(setNumHigh, numHigh + 1)}>+</Button>
-      <Button variant="contained" color="secondary" size="small" onClick={() => incrementFunction(setNumHigh, numHigh - 1)}>-</Button>
-    </>
+  const isDirty = () => !(
+    numHighAuto
+    || numLowAuto
+    || numHighTele
+    || numLowTele
+    || isColorWheel
+    || didClimb
   )
 
-  const lowBallSection = () => (
-    <>
-      <Typography variant="h6">
-          Number Low Balls
-      </Typography>
-      <NumberButton>
-        {numLow}
-      </NumberButton>
-      <Button variant="contained" color="primary" size="small" onClick={() => incrementFunction(setNumLow, numLow + 1)}>+</Button>
-      <Button variant="contained" color="secondary" size="small" onClick={() => incrementFunction(setNumLow, numLow - 1)}>- </Button>
-    </>
-  )
-
-  const handlePanelChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+  const handlePanelChange = (panel: string) => (
+    event: React.ChangeEvent<{}>,
+    isExpanded: boolean,
+  ) => {
     setExpanded(isExpanded ? panel : false)
   }
-  
+
   return (
     <div className={classes.root}>
-      <ExpansionPanel
-        expanded={expanded === 'panel1'}
-        onChange={handlePanelChange('panel1')}
-      >
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography className={classes.heading}>Auton Mode</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Box display="flex" flexDirection="column">
-            <Typography>
-              Please record results of Auton Here!
-            </Typography>
-            <Box>
-              {highBallSection()}
-            </Box>
-            <Box>
-              {lowBallSection()}
-            </Box>
-          </Box>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel
-        expanded={expanded === 'panel2'}
-        onChange={handlePanelChange('panel2')}
-      >
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography className={classes.heading}>Teleop Mode</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Box display="flex" flexDirection="column">
-            <Typography>
-              Please record results of Teleop Here!
-            </Typography>
-            <Box>
-              {highBallSection()}
-            </Box>
-            <Box>
-              {lowBallSection()}
-            </Box>
-          </Box>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-
-      <Fab color="primary" className={classes.saveFab} disabled={isDirty()}>
+      <AutonMode
+        expanded={expanded}
+        handlePanelChange={handlePanelChange}
+        numHigh={numHighAuto}
+        setNumHigh={setNumHighAuto}
+        numLow={numLowAuto}
+        setNumLow={setNumLowAuto}
+      />
+      <TeleMode
+        expanded={expanded}
+        handlePanelChange={handlePanelChange}
+        numHigh={numHighTele}
+        setNumHigh={setNumHighTele}
+        numLow={numLowTele}
+        setNumLow={setNumLowTele}
+        isColorWheel={isColorWheel}
+        setIsColorWheel={setIsColorWheel}
+      />
+      <EndGameMode
+        expanded={expanded}
+        handlePanelChange={handlePanelChange}
+        didClimb={didClimb}
+        setDidClimb={setDidClimb}
+      />
+      <Fab color="primary" className={classes.saveFab} disabled={isDirty()} onClick={() => submitMatch()}>
         <SaveIcon />
       </Fab>
     </div>
   )
-
-  // return (
-  //   <>
-  //     <Paper elevation={3} className={classes.section}>
-  //       <Typography align="center">
-  //         Autonomous Mode
-  //       </Typography>
-  //       {highBallSection()}
-  //       {lowBallSection()}
-  //     </Paper>
-  //     <Button variant="contained" className={classes.submitButton} onClick={() => submitMatch()}>Submit</Button>
-  //   </>
-  // )
 }
