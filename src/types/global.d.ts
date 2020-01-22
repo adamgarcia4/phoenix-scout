@@ -17,6 +17,8 @@ declare namespace NodeJS
         REACT_APP_FIREBASE_STORAGE_BUCKET: string
         REACT_APP_FIREBASE_MESSAGING_SENDER_ID: string
         REACT_APP_FIREBASE_APP_ID: string
-        REACT_APP_FIREBASE_MEASUREMENT_ID: string
+        REACT_APP_FIREBASE_MEASUREMENT_ID: string,
+        REACT_APP_TBA_KEY: string,
+        REACT_APP_TBA_URL: string,
     }
 }

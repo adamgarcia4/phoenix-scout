@@ -43,6 +43,10 @@ module.exports = {
         "tsx": "never"
       }
    ],
-   "@typescript-eslint/no-unused-vars": [2]
+   "@typescript-eslint/no-unused-vars": [2],
+   "indent": ["error", "tab"],
+   'no-tabs': ["error", { allowIndentationTabs: true }],
+   "react/jsx-indent": ["error", 'tab'],
+   'arrow-body-style': [0]
   },
 };
