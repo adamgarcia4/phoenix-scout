@@ -27,7 +27,7 @@ const Teams = () => {
 		{
 			name: 'Name',
 			key: 'nickname',
-		}
+		},
 	]
 	return (
 		<div>
