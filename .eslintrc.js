@@ -47,6 +47,7 @@ module.exports = {
    "indent": ["error", "tab"],
    'no-tabs': ["error", { allowIndentationTabs: true }],
    "react/jsx-indent": ["error", 'tab'],
-   'arrow-body-style': [0]
+   'arrow-body-style': [0],
+   'react/jsx-indent-props': [0]
   },
 };
