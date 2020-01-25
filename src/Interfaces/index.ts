@@ -118,3 +118,30 @@ export type MatchAPIResponse = {
     key: string,
   }[],
 }
+
+export type ScoutedMatch = {
+  /**
+   * Defined as `<MATCHAPI.key>_frc<TbaTeamKey>`
+   */
+  key: string,
+  /**
+   * Shows what state the scouted match is in.
+   */
+  status: 'toBeAssigned' | 'assigned' | 'notScouted' | 'inProgress' | 'scouted',
+  match: string,
+  team: string,
+  time: number,
+  /**
+   * The competition level the match was played at.
+   */
+  compLevel: 'qm' | 'ef' | 'qf' | 'sf' | 'f',
+  side: 'red' | 'blue',
+  data?: {
+    numHighAuto: number,
+    numLowAuto: number,
+    numHighTele: number,
+    numLowTele: number,
+    isColorWheel: boolean,
+    didClimb: boolean,
+  }
+}

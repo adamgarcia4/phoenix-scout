@@ -11,7 +11,7 @@ import firebase from 'firebase'
 
 // import { Theme } from '@material-ui/core'
 import tbaAxios from '../config/tbaAxios'
-import { TeamInterface } from '../Interfaces'
+import { MatchAPIResponse, TeamInterface, ScoutedMatch } from '../Interfaces'
 
 const Alert = (props: AlertProps) =>
 // eslint-disable-next-line
@@ -83,6 +83,61 @@ export default function Admin() {
 		})
 	}
 
+	const seedMatches = () => {
+		tbaAxios.get(`/event/${eventCode}/matches`)
+			.then((res: AxiosResponse<MatchAPIResponse[]>) => {
+				const scoutMatches: ScoutedMatch[] = []
+
+				for (const match of res.data) {
+					const { alliances } = match
+
+					if (match.comp_level === 'qm' && alliances) {
+						for (const teamKey of alliances.red.team_keys) {
+							scoutMatches.push({
+								key: `${match.key}_${teamKey}`,
+								match: match.key,
+								time: match.time || 0,
+								team: teamKey,
+								compLevel: match.comp_level,
+								side: 'red',
+								status: 'toBeAssigned',
+							})
+						}
+
+						for (const teamKey of alliances.blue.team_keys) {
+							scoutMatches.push({
+								key: `${match.key}_${teamKey}`,
+								match: match.key,
+								time: match.time || 0,
+								team: teamKey,
+								compLevel: match.comp_level,
+								side: 'blue',
+								status: 'toBeAssigned',
+							})
+						}
+					}
+				}
+
+				console.log('scoutMatches:', scoutMatches)
+			})
+			.catch(() => {
+				// setOpen({
+				// type: 'error',
+				// message: `Team ${addTeam} could not be loaded!`,
+				// })
+			})
+
+
+		// console.log('scoutMatches:', scoutMatches)
+
+		// firebase.firestore().collection('teams').doc(res.data.key).update(res.data)
+
+		// setOpen({
+		// 	type: 'success',
+		// 	message: `Team ${res.data.team_number} has been loaded!`,
+		// })
+	}
+
 	const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
 		if (reason === 'clickaway') {
 			return
@@ -133,6 +188,9 @@ export default function Admin() {
 			/>
 			<Button variant="contained" color="primary" onClick={() => addTeamToFb()}>
         Fetch Team
+			</Button>
+			<Button variant="contained" color="primary" onClick={() => seedMatches()}>
+        Add Matches
 			</Button>
 		</>
 	)

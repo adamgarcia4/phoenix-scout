@@ -22,7 +22,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 // import MailIcon from '@material-ui/icons/Mail'
 import NoteAddIcon from '@material-ui/icons/NoteAdd'
 import HomeIcon from '@material-ui/icons/Home'
-import ListAltIcon from '@material-ui/icons/ListAlt'
+// import ListAltIcon from '@material-ui/icons/ListAlt'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
 import RedditIcon from '@material-ui/icons/Reddit'
 
@@ -120,18 +120,18 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 		<div className={classes.root}>
 			<CssBaseline />
 			<AppBar
-  position="fixed"
-  className={clsx(classes.appBar, {
+				position="fixed"
+				className={clsx(classes.appBar, {
 					[classes.appBarShift]: open,
 				})}
 			>
 				<Toolbar>
 					<IconButton
-  color="inherit"
-  aria-label="open drawer"
-  onClick={handleDrawerOpen}
-  edge="start"
-  className={clsx(classes.menuButton, open && classes.hide)}
+						color="inherit"
+						aria-label="open drawer"
+						onClick={handleDrawerOpen}
+						edge="start"
+						className={clsx(classes.menuButton, open && classes.hide)}
 					>
 						<MenuIcon />
 					</IconButton>
@@ -141,11 +141,11 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 				</Toolbar>
 			</AppBar>
 			<Drawer
-  className={classes.drawer}
-  variant="persistent"
-  anchor="left"
-  open={open}
-  classes={{
+				className={classes.drawer}
+				variant="persistent"
+				anchor="left"
+				open={open}
+				classes={{
 					paper: classes.drawerPaper,
 				}}
 			>
@@ -156,38 +156,61 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 				</div>
 				<Divider />
 				<List>
-					<ListItem selected={isPath(paths.homePage)} button onClick={() => navigateToPath(paths.homePage)}>
+					<ListItem
+						selected={isPath(paths.homePage)}
+						button
+						onClick={
+							() => navigateToPath(paths.homePage)
+						}
+					>
 						<ListItemIcon>
 							<HomeIcon />
 						</ListItemIcon>
 						<ListItemText primary="Home" />
 					</ListItem>
-					{/* <ListItem selected={isPath(paths.schedulePage)} button onClick={() => navigateToPath(paths.schedulePage)}>
+					{/* <ListItem selected={isPath(paths.schedulePage)}
+					button onClick={() => navigateToPath(paths.schedulePage)}>
 						<ListItemIcon>
 							<ListAltIcon />
 						</ListItemIcon>
 						<ListItemText primary="See Schedule" />
 					</ListItem> */}
-					<ListItem selected={isPath(paths.teamsPage)} button onClick={() => navigateToPath(paths.teamsPage)}>
+					<ListItem
+						selected={isPath(paths.teamsPage)}
+						button
+						onClick={() => navigateToPath(paths.teamsPage)}
+					>
 						<ListItemIcon>
 							<RedditIcon />
 						</ListItemIcon>
 						<ListItemText primary="See Teams" />
 					</ListItem>
-					<ListItem selected={isPath(paths.teamDetailsPage)} button onClick={() => navigateToPath(paths.teamDetailsPage)}>
+					<ListItem
+						selected={isPath(paths.teamDetailsPage)}
+						button
+						onClick={() => navigateToPath(paths.teamDetailsPage)}
+					>
 						<ListItemIcon>
 							<RedditIcon />
 						</ListItemIcon>
 						<ListItemText primary="See Team Details" />
 					</ListItem>
-					<ListItem selected={isPath(paths.addMatchPage)} button onClick={() => navigateToPath(paths.addMatchPage)}>
+					<ListItem
+						selected={isPath(paths.addMatchPage)}
+						button
+						onClick={() => navigateToPath(paths.addMatchPage)}
+					>
 						<ListItemIcon>
 							<NoteAddIcon />
 						</ListItemIcon>
 						<ListItemText primary="Add Match" />
 					</ListItem>
 					<Divider />
-					<ListItem selected={isPath(paths.adminPage)} button onClick={() => navigateToPath(paths.adminPage)}>
+					<ListItem
+						selected={isPath(paths.adminPage)}
+						button
+						onClick={() => navigateToPath(paths.adminPage)}
+					>
 						<ListItemIcon>
 							<SupervisorAccountIcon />
 						</ListItemIcon>
