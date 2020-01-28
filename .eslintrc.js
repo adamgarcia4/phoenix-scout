@@ -52,5 +52,6 @@ module.exports = {
    'no-restricted-syntax': [0],
   //  'react/jsx-first-prop-new-line': 'multiline'
     camelcase: [0],
+    'no-console': [0],
   },
 };

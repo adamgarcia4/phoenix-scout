@@ -2,26 +2,31 @@
 import React from 'react'
 import { Typography } from '@material-ui/core'
 
-import firebase from 'firebase/app'
+// import firebase from 'firebase/app'
 
 import 'firebase/firestore'
-import { useCollection } from 'react-firebase-hooks/firestore'
-import moment from 'moment'
+// import { useCollection } from 'react-firebase-hooks/firestore'
+// import moment from 'moment'
 
+// import Axios from 'axios'
+import useAxios from 'axios-hooks'
 import TableComponent, { HeadersInterface } from './ui/Table'
-import { ScoutedMatch, MatchInterface } from './Interfaces'
+import { MatchInterface } from './Interfaces'
 
-const matchesRefInOrder = firebase
-	.firestore()
-	.collection('scoutMatches')
-	.orderBy('time', 'asc')
+// const matchesRefInOrder = firebase
+// .firestore()
+// .collection('scoutMatches')
+// .orderBy('time', 'asc')
 
 const Home: React.FC = () => {
-	const [scoutMatches] = useCollection(matchesRefInOrder)
+	// const [scoutMatches] = useCollection(matchesRefInOrder)
+	const [{ data }] = useAxios('http://localhost:8080')
 
-	const scoutMatchesArr: ScoutedMatch[] = scoutMatches?.docs.map(
-		(doc) => doc.data() as ScoutedMatch
-	) || []
+	console.log('data:', data)
+
+	// const scoutMatchesArr: ScoutedMatch[] = scoutMatches?.docs.map(
+	// (doc) => doc.data() as ScoutedMatch
+	// ) || []
 
 	const output: MatchInterface[] = [
 		{
@@ -32,11 +37,11 @@ const Home: React.FC = () => {
 
 
 	// const output = scoutMatchesArr.reduce((base, scoutedMatch) => {
-	// 	if (!base[scoutedMatch.match]) {
-	// 		base[scoutedMatch.match] = {}
-	// 	}
+	// if (!base[scoutedMatch.match]) {
+	// base[scoutedMatch.match] = {}
+	// }
 
-	// 	base[scoutedMatch.match].
+	// base[scoutedMatch.match].
 	// }, {})
 
 	const headers: HeadersInterface[] = [
@@ -54,6 +59,7 @@ const Home: React.FC = () => {
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
+			<h2>{data}</h2>
 			<Typography variant="h4">
         Upcoming Matches
 			</Typography>
@@ -65,28 +71,28 @@ const Home: React.FC = () => {
 export default Home
 
 // const headersForMatchResult = [
-// 	{
-// 		name: '# High Auto',
-// 		key: 'numHighAuto',
-// 	},
-// 	{
-// 		name: '# Low Auto',
-// 		key: 'numLowAuto',
-// 	},
-// 	{
-// 		name: '# High Teleop',
-// 		key: 'numHighTele',
-// 	},
-// 	{
-// 		name: '# Low Teleop',
-// 		key: 'numLowTele',
-// 	},
-// 	{
-// 		name: 'Did Engage Colorwheel',
-// 		key: 'isColorWheel',
-// 	},
-// 	{
-// 		name: 'Did Climb',
-// 		key: 'didClimb',
-// 	},
+// {
+// name: '# High Auto',
+// key: 'numHighAuto',
+// },
+// {
+// name: '# Low Auto',
+// key: 'numLowAuto',
+// },
+// {
+// name: '# High Teleop',
+// key: 'numHighTele',
+// },
+// {
+// name: '# Low Teleop',
+// key: 'numLowTele',
+// },
+// {
+// name: 'Did Engage Colorwheel',
+// key: 'isColorWheel',
+// },
+// {
+// name: 'Did Climb',
+// key: 'didClimb',
+// },
 // ]

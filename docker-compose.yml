@@ -11,8 +11,11 @@ services:
     ports:
       - '3001:3000'
     environment:
-			- NODE_ENV=development
-	backend:
-		container_name: backend
-		build:
-      
+      - NODE_ENV=development
+  backend:
+    container_name: backend
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
