@@ -13,6 +13,8 @@ import firebase from 'firebase'
 import tbaAxios from '../config/tbaAxios'
 import { MatchAPIResponse, TeamInterface, ScoutedMatch } from '../Interfaces'
 
+// https://forum.quasar-framework.org/topic/2560/solved-pwa-force-refresh-when-new-version-released/21
+
 const Alert = (props: AlertProps) =>
 // eslint-disable-next-line
    <MuiAlert elevation={6} variant="filled" {...props} />
@@ -83,51 +85,61 @@ export default function Admin() {
 		})
 	}
 
-	const seedMatches = () => {
-		tbaAxios.get(`/event/${eventCode}/matches`)
-			.then((res: AxiosResponse<MatchAPIResponse[]>) => {
-				const scoutMatches: ScoutedMatch[] = []
+	const seedMatches = async () => {
+		const res: AxiosResponse<MatchAPIResponse[]> = await tbaAxios.get(`/event/${eventCode}/matches`)
 
-				for (const match of res.data) {
-					const { alliances } = match
+		const scoutMatches: ScoutedMatch[] = []
 
-					if (match.comp_level === 'qm' && alliances) {
-						for (const teamKey of alliances.red.team_keys) {
-							scoutMatches.push({
-								key: `${match.key}_${teamKey}`,
-								match: match.key,
-								time: match.time || 0,
-								team: teamKey,
-								compLevel: match.comp_level,
-								side: 'red',
-								status: 'toBeAssigned',
-							})
-						}
+		for (const match of res.data) {
+			const { alliances } = match
 
-						for (const teamKey of alliances.blue.team_keys) {
-							scoutMatches.push({
-								key: `${match.key}_${teamKey}`,
-								match: match.key,
-								time: match.time || 0,
-								team: teamKey,
-								compLevel: match.comp_level,
-								side: 'blue',
-								status: 'toBeAssigned',
-							})
-						}
-					}
+			if (match.comp_level === 'qm' && alliances) {
+				for (const teamKey of alliances.red.team_keys) {
+					scoutMatches.push({
+						key: `${match.key}_${teamKey}`,
+						match: match.key,
+						time: match.time || 0,
+						team: teamKey,
+						compLevel: match.comp_level,
+						side: 'red',
+						status: 'toBeAssigned',
+					})
 				}
 
-				console.log('scoutMatches:', scoutMatches)
-			})
-			.catch(() => {
-				// setOpen({
-				// type: 'error',
-				// message: `Team ${addTeam} could not be loaded!`,
-				// })
-			})
+				for (const teamKey of alliances.blue.team_keys) {
+					scoutMatches.push({
+						key: `${match.key}_${teamKey}`,
+						match: match.key,
+						time: match.time || 0,
+						team: teamKey,
+						compLevel: match.comp_level,
+						side: 'blue',
+						status: 'toBeAssigned',
+					})
+				}
+			}
+		}
+
+		console.log('scoutMatches:', scoutMatches)
 
 
+		// firebase.firestore().collection('scoutMatches')
+		let batch = firebase.firestore().batch()
+		let counter = 0
+
+		for await (const scoutMatch of scoutMatches) {
+			const ref = firebase.firestore().collection('scoutMatches').doc(scoutMatch.key)
+			if (counter < 500) {
+				batch.set(ref, scoutMatch)
+				counter += 1
+			} else {
+				await batch.commit()
+				batch = firebase.firestore().batch()
+				counter = 0
+			}
+		}
+
+		batch.commit().then(() => console.log('done!'))
 		// console.log('scoutMatches:', scoutMatches)
 
 		// firebase.firestore().collection('teams').doc(res.data.key).update(res.data)
@@ -136,6 +148,18 @@ export default function Admin() {
 		// 	type: 'success',
 		// 	message: `Team ${res.data.team_number} has been loaded!`,
 		// })
+	}
+
+	const seedData = async () => {
+		firebase.firestore().collection('scoutMatches').add({
+			compLevel: 'qm',
+			key: 'key1',
+			match: 'match1',
+			side: 'red',
+			status: 'toBeAssigned',
+			team: 'frc4',
+			time: 1,
+		} as ScoutedMatch)
 	}
 
 	const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
@@ -191,6 +215,9 @@ export default function Admin() {
 			</Button>
 			<Button variant="contained" color="primary" onClick={() => seedMatches()}>
         Add Matches
+			</Button>
+			<Button variant="contained" color="primary" onClick={() => seedData()}>
+        Seed Data
 			</Button>
 		</>
 	)

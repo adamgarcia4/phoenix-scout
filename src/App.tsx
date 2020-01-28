@@ -15,7 +15,7 @@ import TeamsPage from './Pages/Teams'
 
 export const paths = {
 	aboutPage: '/about',
-	addMatchPage: '/add-match',
+	addMatchPage: '/add-match/:matchKey',
 	teamsPage: '/teams',
 	teamDetailsPage: '/team-detail',
 	adminPage: '/admin',

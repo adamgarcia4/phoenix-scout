@@ -14,13 +14,14 @@ const useStyles = makeStyles({
 	},
 })
 
-interface HeadersInterface {
+export interface HeadersInterface {
 	name: string,
 	key: string,
 	align?: 'right',
+	getValue?: Function | undefined,
 }
 
-interface DataInterface {
+export interface DataInterface {
 	[key: string]: any,
 }
 interface Props {
@@ -46,12 +47,24 @@ interface DataComponentProps {
 	headers: HeadersInterface[]
 }
 const DataComponent = ({ data, headers }: DataComponentProps) => {
+	// eslint-disable-next-line no-shadow
+	const getValue = (row, key: string, getValue: Function | undefined) => {
+		return (getValue && getValue(row[key])) ?? row[key]
+	}
+	
 	return (
 		<TableBody>
 			{data.map((row) => (
 				<TableRow key={row[headers[0].key]}>
 					{headers.map((header) => (
-						<TableCell component="th" align={header.align} key={header.key}>{row[header.key]}</TableCell>
+						<TableCell
+							component="th"
+							align={header.align}
+							key={header.key}
+						>
+							{getValue(row, header.key, header.getValue)}
+							{/* {row[header.key]} */}
+						</TableCell>
 					))}
 				</TableRow>
 			))}

@@ -1,108 +1,92 @@
-import React, { useState, useEffect } from 'react'
-// import { makeStyles } from '@material-ui/core/styles'
-// import Table from '@material-ui/core/Table'
-// import TableBody from '@material-ui/core/TableBody'
-// import TableCell from '@material-ui/core/TableCell'
-// import TableContainer from '@material-ui/core/TableContainer'
-// import TableHead from '@material-ui/core/TableHead'
-// import TableRow from '@material-ui/core/TableRow'
-// import Paper from '@material-ui/core/Paper'
-// import Button from '@material-ui/core/Button'
+/* eslint-disable no-param-reassign */
+import React from 'react'
 import { Typography } from '@material-ui/core'
 
 import firebase from 'firebase/app'
-import TableComponent from './ui/Table'
 
 import 'firebase/firestore'
+import { useCollection } from 'react-firebase-hooks/firestore'
+import moment from 'moment'
 
-import { MatchInterface } from './Interfaces'
+import TableComponent, { HeadersInterface } from './ui/Table'
+import { ScoutedMatch, MatchInterface } from './Interfaces'
+
+const matchesRefInOrder = firebase
+	.firestore()
+	.collection('scoutMatches')
+	.orderBy('time', 'asc')
 
 const Home: React.FC = () => {
-	// const [one, two] = useState
-	const [matchesArr, setMatchesArr] = useState<MatchInterface[]>([])
+	const [scoutMatches] = useCollection(matchesRefInOrder)
 
-	useEffect(() => {
-		firebase.firestore().collection('matches').onSnapshot((docs) => {
-			const newMatches = docs.docs.map((doc: any) => {
-				const matchObj: MatchInterface = doc.data()
-				return matchObj
-			})
+	const scoutMatchesArr: ScoutedMatch[] = scoutMatches?.docs.map(
+		(doc) => doc.data() as ScoutedMatch
+	) || []
 
-			setMatchesArr(() => [...matchesArr, ...newMatches])
-		})
-	})
-
-	useEffect(() => {
-		// firebase.firestore().collection('teams').onSnapshot((docs) => {
-		// const newMatches = docs.docs.map((doc: any) => {
-		// const matchObj: MatchInterface = doc.data()
-
-		// return matchObj
-		// })
-
-		// // setMatchesArr(() => [...matchesArr, ...newMatches])
-		// })
-
-		// .onSnapshot((docs) => {
-		//   docs.docs.map(doc => {
-		//     const test = doc.data()
-		//     test
-		//   })
-
-		//   const newMatches = docs.docs.map((doc) => {
-		//     const newMatch = doc.data()
-
-		//     return newMatch
-		//   })
-
-		//   setMatchesArr(() => [...matchesArr, ...newMatches])
-		// })
-	}, [])
-
-	const headers = [
+	const output: MatchInterface[] = [
 		{
-			name: '# High Auto',
-			key: 'numHighAuto',
-		},
-		{
-			name: '# Low Auto',
-			key: 'numLowAuto',
-		},
-		{
-			name: '# High Teleop',
-			key: 'numHighTele',
-		},
-		{
-			name: '# Low Teleop',
-			key: 'numLowTele',
-		},
-		{
-			name: 'Did Engage Colorwheel',
-			key: 'isColorWheel',
-		},
-		{
-			name: 'Did Climb',
-			key: 'didClimb',
+			name: 'match1',
+			teams: [4, 330, 254],
 		},
 	]
 
-	const tableData = matchesArr.map((matchData) => {
-		return {
-			...matchData,
-			didClimb: matchData.didClimb ? 'Yes' : 'No',
-			isColorWheel: matchData.isColorWheel ? 'Yes' : 'No',
-		}
-	})
+
+	// const output = scoutMatchesArr.reduce((base, scoutedMatch) => {
+	// 	if (!base[scoutedMatch.match]) {
+	// 		base[scoutedMatch.match] = {}
+	// 	}
+
+	// 	base[scoutedMatch.match].
+	// }, {})
+
+	const headers: HeadersInterface[] = [
+		{
+			name: 'Match Name',
+			key: 'name',
+		},
+		{
+			name: 'Teams In Match',
+			key: 'teams',
+			getValue: (arr: string[]) => arr.join(', '),
+		},
+	]
 
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
 			<Typography variant="h4">
-        Current Matches
+        Upcoming Matches
 			</Typography>
-			<TableComponent headers={headers} data={tableData} />
+			<TableComponent headers={headers} data={output} />
 		</div>
 	)
 }
 
 export default Home
+
+// const headersForMatchResult = [
+// 	{
+// 		name: '# High Auto',
+// 		key: 'numHighAuto',
+// 	},
+// 	{
+// 		name: '# Low Auto',
+// 		key: 'numLowAuto',
+// 	},
+// 	{
+// 		name: '# High Teleop',
+// 		key: 'numHighTele',
+// 	},
+// 	{
+// 		name: '# Low Teleop',
+// 		key: 'numLowTele',
+// 	},
+// 	{
+// 		name: 'Did Engage Colorwheel',
+// 		key: 'isColorWheel',
+// 	},
+// 	{
+// 		name: 'Did Climb',
+// 		key: 'didClimb',
+// 	},
+// ]
