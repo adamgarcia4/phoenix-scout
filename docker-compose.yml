@@ -3,7 +3,7 @@ services:
   frontend:
     container_name: frontend
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
     volumes:
       - '.:/app'
@@ -12,10 +12,16 @@ services:
       - '3001:3000'
     environment:
       - NODE_ENV=development
+    env_file:
+      - ./.env
   backend:
     container_name: backend
+    # volumes:
+    #   - './server:/usr/src/app'
     build:
       context: ./server
       dockerfile: Dockerfile
     ports:
       - '8080:8080'
+    env_file:
+      - ./.env
