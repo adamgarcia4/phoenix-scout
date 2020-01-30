@@ -73,7 +73,7 @@ const DataComponent = ({ data, headers }: DataComponentProps) => {
 }
 
 const TableComponent = ({ headers, data }: Props) => {
-	const classes = useStyles()
+	const classes = useStyles({})
 	return (
 		<>
 			<TableContainer component={Paper}>

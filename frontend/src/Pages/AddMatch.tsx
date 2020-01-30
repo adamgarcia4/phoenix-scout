@@ -173,7 +173,7 @@ const EndGameMode = ({
 	didClimb,
 	setDidClimb,
 }: EndGameModeProps) => {
-	// const classes = useStyles()
+	// const classes = useStyles({})
 	return (
 		<Box display="flex" flexDirection="column">
 			<Typography>
@@ -206,7 +206,7 @@ export default function AddMatch() {
 	const history = useHistory()
 
 	const [expanded, setExpanded] = useState<string | false>('panel1')
-	const classes = useStyles()
+	const classes = useStyles({})
 
 	const submitMatch = () => {
 		firebase.firestore().collection('matches').add({

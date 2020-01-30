@@ -48,7 +48,7 @@ const ExpansionSection = ({
 	title,
 	content,
 }: ExpansionSectionProps) => {
-	const classes = useStyles()
+	const classes = useStyles({})
 
 	return (
 		<ExpansionPanel
@@ -78,7 +78,7 @@ interface ExpansionProps {
 const Expansion = ({
 	sections,
 }: ExpansionProps) => {
-	const classes = useStyles()
+	const classes = useStyles({})
 	// TODO: Option to start with a panel expanded
 	const [expanded, setExpanded] = useState<string | false>(false)
 

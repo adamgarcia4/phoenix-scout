@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 }))
 
 function PersistentDrawerLeft({ children }: {children: any}) {
-	const classes = useStyles()
+	const classes = useStyles({})
 	const theme = useTheme()
 
 	const history = useHistory()

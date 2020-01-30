@@ -38,7 +38,7 @@ export default function Admin() {
 	const [addTeam, setAddTeam] = useState('')
 	const [open, setOpen] = useState<MessageI | false>(false)
 
-	const classes = useStyles()
+	const classes = useStyles({})
 
 
 	const getTeams = () => {
