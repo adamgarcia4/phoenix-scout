@@ -11,3 +11,4 @@ server/node_modules
 server/dist
 server1/node_modules
 # testing
+.env

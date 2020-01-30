@@ -38,15 +38,6 @@ const Home: React.FC = () => {
 		},
 	]
 
-
-	// const output = scoutMatchesArr.reduce((base, scoutedMatch) => {
-	// if (!base[scoutedMatch.match]) {
-	// base[scoutedMatch.match] = {}
-	// }
-
-	// base[scoutedMatch.match].
-	// }, {})
-
 	const headers: HeadersInterface[] = [
 		{
 			name: 'Match Name',
