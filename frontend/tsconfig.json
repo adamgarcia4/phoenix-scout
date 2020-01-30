@@ -1,6 +1,10 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
+    "outDir": "dist",
+    "baseUrl": "./src",
+    "rootDir": "src",
+    "target": "ES5",
     "lib": [
       "dom",
       "dom.iterable",
@@ -22,5 +26,6 @@
   },
   "include": [
     "src"
-  ]
+  ],
+  "extends": "./tsconfig.paths.json"
 }

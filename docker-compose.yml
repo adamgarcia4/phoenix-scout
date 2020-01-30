@@ -5,23 +5,26 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - '.:/app'
-      - '/app/node_modules'
+      target: development
+    command: ["npm", "run", "start"]
     ports:
-      - '3001:3000'
-    environment:
-      - NODE_ENV=development
+      - '3000:3000'
+    volumes:
+      - './frontend/src:/var/build/frontend/src:delegated'
+      - './shared/src:/var/build/shared/src:delegated'
     env_file:
-      - ./.env
+      - ./frontend/.env
   backend:
     container_name: backend
-    # volumes:
-    #   - './server:/usr/src/app'
     build:
       context: ./server
       dockerfile: Dockerfile
+      target: development
+    command: ["npm", "run", "debug"]
     ports:
       - '8080:8080'
+    volumes:
+      - './server/src:/var/build/server/src:delegated'
+      - './shared/src:/var/build/shared/src:delegated'
     env_file:
-      - ./.env
+      - ./server/.env

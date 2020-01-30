@@ -12,6 +12,9 @@ import 'firebase/firestore'
 import useAxios from 'axios-hooks'
 import TableComponent, { HeadersInterface } from './ui/Table'
 import { MatchInterface } from './Interfaces'
+import { Model } from '@shared/model'
+
+console.log('new Model().title:', new Model().title)
 
 // const matchesRefInOrder = firebase
 // .firestore()

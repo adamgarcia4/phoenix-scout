@@ -5,17 +5,27 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.$NODE_ENV.js",
-    "start": "node dist/server"
+    "start": "node dist/server",
+    "debug": "tsc-watch --onSuccess \"node -r module-alias/register --inspect=0.0.0.0:9229 dist/server//src/main.js\" --onFailure \"echo WHOOPS! Server compilation failed\""
   },
   "author": "Adam Garcia <adameitangarcia@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@types/module-alias": "*",
+    "@types/node": "^13.5.1",
+    "@types/rimraf": "*",
     "@types/webpack": "*",
     "@types/webpack-env": "^1.15.0",
     "@types/webpack-merge": "*",
     "@types/webpack-node-externals": "*",
+    "apollo-server": "^2.9.16",
     "clean-webpack-plugin": "^3.0.0",
+    "dotenv": "^8.2.0",
+    "graphql": "^14.6.0",
+    "module-alias": "^2.2.2",
+    "rimraf": "^3.0.1",
     "ts-loader": "^6.2.1",
+    "tsc-watch": "^4.1.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-merge": "^4.2.2",
@@ -23,5 +33,8 @@
   },
   "devDependencies": {
     "typescript": "^3.7.5"
+  },
+  "_moduleAliases": {
+    "@shared": "dist/shared/src"
   }
 }
