@@ -5,7 +5,6 @@ import { Typography } from '@material-ui/core'
 // import firebase from 'firebase/app'
 
 import 'firebase/firestore'
-// import { useCollection } from 'react-firebase-hooks/firestore'
 // import moment from 'moment'
 
 // import Axios from 'axios'
@@ -21,11 +20,29 @@ import { MatchInterface } from './Interfaces'
 // .collection('scoutMatches')
 // .orderBy('time', 'asc')
 
+import { useQuery } from '@apollo/react-hooks'
+import { gql } from 'apollo-boost'
+
+const FIRST_QUERY = gql`
+	{
+		scoutedMatches {
+			key
+			status
+			compLevel
+			time
+			assignedTo {
+				name
+			}
+		}
+	}
+`
 const Home: React.FC = () => {
 	// const [scoutMatches] = useCollection(matchesRefInOrder)
-	const [{ data }] = useAxios('http://localhost:8080')
+	const { data } = useQuery(FIRST_QUERY)
 
-	console.log('data:', data)
+	// const [{ data }] = useAxios('http://localhost:8080')
+
+	// console.log('data:', data)
 
 	// const scoutMatchesArr: ScoutedMatch[] = scoutMatches?.docs.map(
 	// (doc) => doc.data() as ScoutedMatch
@@ -53,7 +70,7 @@ const Home: React.FC = () => {
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
-			<h2>{data}</h2>
+			<h2>{JSON.stringify(data)}</h2>
 			<Typography variant="h4">
         Upcoming Matches
 			</Typography>
