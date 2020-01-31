@@ -2,23 +2,11 @@
 import React from 'react'
 import { Typography } from '@material-ui/core'
 
-// import firebase from 'firebase/app'
-
 import 'firebase/firestore'
-// import moment from 'moment'
 
-// import Axios from 'axios'
-import useAxios from 'axios-hooks'
 import TableComponent, { HeadersInterface } from './ui/Table'
-import { MatchInterface } from './Interfaces'
-// import { Model } from '@shared/model'
-
-// console.log('new Model().title:', new Model().title)
-
-// const matchesRefInOrder = firebase
-// .firestore()
-// .collection('scoutMatches')
-// .orderBy('time', 'asc')
+// import { MatchInterface } from './Interfaces'
+import { ScoutedMatch } from '@shared/Interfaces'
 
 import { useQuery } from '@apollo/react-hooks'
 import { gql } from 'apollo-boost'
@@ -30,51 +18,43 @@ const FIRST_QUERY = gql`
 			status
 			compLevel
 			time
+			team
 			assignedTo {
 				name
 			}
 		}
 	}
 `
+
+interface QueryResponse {
+	scoutedMatches?: [ScoutedMatch]
+}
 const Home: React.FC = () => {
 	// const [scoutMatches] = useCollection(matchesRefInOrder)
-	const { data } = useQuery(FIRST_QUERY)
-
-	// const [{ data }] = useAxios('http://localhost:8080')
-
-	// console.log('data:', data)
-
-	// const scoutMatchesArr: ScoutedMatch[] = scoutMatches?.docs.map(
-	// (doc) => doc.data() as ScoutedMatch
-	// ) || []
-
-	const output: MatchInterface[] = [
-		{
-			name: 'match1',
-			teams: [4, 330, 254],
-		},
-	]
+	const { data } = useQuery<QueryResponse>(FIRST_QUERY)
 
 	const headers: HeadersInterface[] = [
 		{
 			name: 'Match Name',
-			key: 'name',
+			key: 'key',
 		},
 		{
-			name: 'Teams In Match',
-			key: 'teams',
-			getValue: (arr: string[]) => arr.join(', '),
+			name: 'Status',
+			key: 'status'
 		},
+		{
+			name: 'Team',
+			key: 'team'
+		}
 	]
 
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
-			<h2>{JSON.stringify(data)}</h2>
 			<Typography variant="h4">
         Upcoming Matches
 			</Typography>
-			<TableComponent headers={headers} data={output} />
+			<TableComponent headers={headers} data={data?.scoutedMatches} />
 		</div>
 	)
 }

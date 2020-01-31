@@ -6,7 +6,7 @@ import {
 	Route,
 } from 'react-router-dom'
 
-import ApolloClient, { gql } from 'apollo-boost';
+import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from "@apollo/react-hooks";
 import './config/firebase'
 import About from './About'
@@ -16,6 +16,8 @@ import Admin from './Pages/Admin'
 import Header from './components/Header'
 import TeamDetail from './Pages/TeamDetail'
 import TeamsPage from './Pages/Teams'
+
+console.log('process.env:', process.env)
 
 const client = new ApolloClient({
   uri: 'http://localhost:8080/',
