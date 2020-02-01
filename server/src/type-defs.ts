@@ -38,4 +38,8 @@ export default gql`
 		"""
 		testMessage: String!
 	}
+
+	type Mutation {
+		seedMatches(eventCode: String): [ScoutedMatch]
+	}
 `
