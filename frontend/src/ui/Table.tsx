@@ -24,9 +24,9 @@ export interface HeadersInterface {
 export interface DataInterface {
 	[key: string]: any,
 }
-interface Props {
+interface TableProps {
 	headers: HeadersInterface[],
-	data: DataInterface[],
+	data?: DataInterface[] | undefined,
 }
 
 interface HeaderComponentProps {
@@ -42,11 +42,7 @@ const HeaderComponent = ({ headers }: HeaderComponentProps) => (
 	</TableHead>
 )
 
-interface DataComponentProps {
-	data: DataInterface[],
-	headers: HeadersInterface[]
-}
-const DataComponent = ({ data, headers }: DataComponentProps) => {
+const DataComponent = ({ data, headers }: TableProps) => {
 	// eslint-disable-next-line no-shadow
 	const getValue = (row, key: string, getValue: Function | undefined) => {
 		return (getValue && getValue(row[key])) ?? row[key]
@@ -54,7 +50,7 @@ const DataComponent = ({ data, headers }: DataComponentProps) => {
 	
 	return (
 		<TableBody>
-			{data.map((row) => (
+			{data?.map((row) => (
 				<TableRow key={row[headers[0].key]}>
 					{headers.map((header) => (
 						<TableCell
@@ -72,7 +68,7 @@ const DataComponent = ({ data, headers }: DataComponentProps) => {
 	)
 }
 
-const TableComponent = ({ headers, data }: Props) => {
+const TableComponent = ({ headers, data }: TableProps) => {
 	const classes = useStyles({})
 	return (
 		<>

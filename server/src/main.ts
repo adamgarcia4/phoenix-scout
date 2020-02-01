@@ -1,11 +1,15 @@
 import { ApolloServer } from "apollo-server";
 import * as dotenv from "dotenv";
 import { ScoutedMatch } from '@shared/Interfaces'
+import path from 'path'
+
+dotenv.config({
+	path: path.resolve(__dirname, '../../../../.env')
+})
 
 import resolvers from './resolvers'
 import typeDefs from './type-defs'
 
-dotenv.config()
 
 const server = new ApolloServer({ resolvers, typeDefs })
 server.listen(process.env.SERVER_PORT).then(({ url }) => console.log(`Server ready at ${url}`))

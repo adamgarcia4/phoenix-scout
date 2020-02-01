@@ -5,6 +5,9 @@ import {
 	Switch,
 	Route,
 } from 'react-router-dom'
+
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from "@apollo/react-hooks";
 import './config/firebase'
 import About from './About'
 import Home from './Home'
@@ -13,6 +16,12 @@ import Admin from './Pages/Admin'
 import Header from './components/Header'
 import TeamDetail from './Pages/TeamDetail'
 import TeamsPage from './Pages/Teams'
+
+console.log('process.env:', process.env)
+
+const client = new ApolloClient({
+  uri: 'http://localhost:8080/',
+});
 
 export const paths = {
 	aboutPage: '/about',
@@ -25,30 +34,32 @@ export const paths = {
 }
 
 const App: React.FC = () => (
-	<Router>
-		<Header>
-			<Switch>
-				<Route path={paths.aboutPage}>
-					<About />
-				</Route>
-				<Route path={paths.addMatchPage}>
-					<AddMatch />
-				</Route>
-				<Route path={paths.teamsPage}>
-					<TeamsPage />
-				</Route>
-				<Route path={paths.teamDetailsPage}>
-					<TeamDetail />
-				</Route>
-				<Route path={paths.adminPage}>
-					<Admin />
-				</Route>
-				<Route path={paths.homePage}>
-					<Home />
-				</Route>
-			</Switch>
-		</Header>
-	</Router>
+	<ApolloProvider client={client}>
+		<Router>
+			<Header>
+				<Switch>
+					<Route path={paths.aboutPage}>
+						<About />
+					</Route>
+					<Route path={paths.addMatchPage}>
+						<AddMatch />
+					</Route>
+					<Route path={paths.teamsPage}>
+						<TeamsPage />
+					</Route>
+					<Route path={paths.teamDetailsPage}>
+						<TeamDetail />
+					</Route>
+					<Route path={paths.adminPage}>
+						<Admin />
+					</Route>
+					<Route path={paths.homePage}>
+						<Home />
+					</Route>
+				</Switch>
+			</Header>
+		</Router>
+	</ApolloProvider>
 )
 
 export default App

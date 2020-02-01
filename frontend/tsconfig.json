@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "types": ["react", "jest", "node", "prop-types", "react-router-dom", "styled-components"],
+    "outDir": "dist",
     "sourceMap": true,
     "noImplicitAny": false,
     "module": "commonjs",
@@ -17,9 +18,9 @@
     "allowJs": true,
     "baseUrl": "./",
     "paths": {
-      "components/*": [
-        "src/components/*"
-      ],
+			"@shared/*": [
+				"../shared/src/*"
+			]
     }
   }
 }

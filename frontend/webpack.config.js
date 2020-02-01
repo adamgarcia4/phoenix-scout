@@ -1,9 +1,10 @@
 const path = require('path');
-// const webpack = require('webpack')
+const webpack = require('webpack')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const Dotenv = require('dotenv-webpack')
+// const Dotenv = require('dotenv-webpack')
+const dotenv = require('dotenv').config({ path: __dirname + '/../.env' })
 
 module.exports = () => {
 	return {
@@ -21,7 +22,10 @@ module.exports = () => {
 			rules: [
 				{
 					test: /\.tsx?$/,
-					loader: 'awesome-typescript-loader'
+					loader: 'awesome-typescript-loader',
+					options: {
+						sourceMap: true
+					}
 				}, 
 				{
 					test: /\.css$/i,
@@ -38,12 +42,12 @@ module.exports = () => {
 				template: './public/index.html'
 			}),
 			new MiniCssExtractPlugin(),
-			new Dotenv({
-				path: path.resolve(__dirname, '../.env')
+			new webpack.DefinePlugin({
+				"process.env": JSON.stringify(dotenv.parsed)
 			})
 		],
 		devServer: {
-			port: 9000
+			port: 3000
 		}
 	}
 }
