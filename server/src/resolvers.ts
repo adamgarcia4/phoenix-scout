@@ -1,36 +1,30 @@
-import { IResolvers } from "apollo-server";
+import { IResolvers, IResolverObject } from "apollo-server";
 import { ScoutedMatch } from "@shared/Interfaces"
+import { ScoutedMatchModel } from './models'
+
+interface ScoutedMatchArgs {
+	filter?: {
+		team?: string,
+	}
+}
 
 const resolverMap: IResolvers = {
 	Query: {
 		testMessage: (): string => 'Hello World!',
-		scoutedMatches: (): ScoutedMatch[]=> {
-			return [
-				{
-					key: 'match1',
-					status: 'toBeAssigned',
-					compLevel: 'qm',
-					match: 'match1',
-					side: 'blue',
-					team: 'frc4',
-					time: new Date().valueOf(),
-					assignedTo: {
-						name: 'Adam Garcia'
-					}
-				},
-				{
-					key: 'match2',
-					status: 'toBeAssigned',
-					compLevel: 'qm',
-					match: 'match2',
-					side: 'red',
-					team: 'frc254',
-					time: new Date().valueOf(),
-					assignedTo: {
-						name: 'Daniel'
-					}
-				},
-			]
+		scoutedMatches: (parent, args: ScoutedMatchArgs, context, info): ScoutedMatch[]=> {
+			const { team = '' } = args?.filter ?? {}
+			
+			if (Object.keys(args).length === 0) {
+				return ScoutedMatchModel.get()
+			}
+
+			return ScoutedMatchModel.get((match => {
+				if (team && match.team === team) {
+					return true
+				}
+
+				return false
+			}))
 		}
 	}
 }

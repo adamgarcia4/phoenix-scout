@@ -52,7 +52,7 @@ const Home: React.FC = () => {
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
 			<Typography variant="h4">
-        Upcoming Matches
+        Assigned to me
 			</Typography>
 			<TableComponent headers={headers} data={data?.scoutedMatches} />
 		</div>
