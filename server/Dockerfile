@@ -1,6 +1,6 @@
 FROM node:12-alpine as base
 
-WORKDIR /var/build
+WORKDIR /workdir/server
 
 #------ PRE-REQS --------
 FROM base as prereq

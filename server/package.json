@@ -34,8 +34,5 @@
   },
   "devDependencies": {
     "typescript": "^3.7.5"
-  },
-  "_moduleAliases": {
-    "@shared": "dist/shared/src"
   }
 }

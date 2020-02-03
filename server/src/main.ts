@@ -1,6 +1,5 @@
 import { ApolloServer } from "apollo-server";
 import * as dotenv from "dotenv";
-import { ScoutedMatch } from '@shared/Interfaces'
 import path from 'path'
 
 dotenv.config({
