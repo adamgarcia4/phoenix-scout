@@ -3,12 +3,11 @@ const webpack = require('webpack')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-// const Dotenv = require('dotenv-webpack')
 const dotenv = require('dotenv').config({ path: __dirname + '/../.env' })
 
 module.exports = () => {
 	return {
-		entry: './src/index.tsx',
+		entry: path.join(__dirname, '/src/index.tsx'),
 		target: 'web',
 		// externals: [nodeExternals()],
 		resolve: {
@@ -16,7 +15,8 @@ module.exports = () => {
 		},
 		output: {
 			path: path.join(__dirname, '/dist'),
-			filename: 'bundle.min.js'
+			filename: 'bundle.min.js',
+			publicPath: '/',
 		},
 		module: {
 			rules: [
@@ -47,7 +47,9 @@ module.exports = () => {
 			})
 		],
 		devServer: {
-			port: 3000
+			port: 3000,
+			host: '0.0.0.0',
+			historyApiFallback: true,
 		}
 	}
 }
