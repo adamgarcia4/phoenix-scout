@@ -7,8 +7,6 @@ import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
 import { AxiosResponse } from 'axios'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 
-import firebase from 'firebase'
-
 // import { Theme } from '@material-ui/core'
 import tbaAxios from '../config/tbaAxios'
 import { MatchAPIResponse, TeamInterface, ScoutedMatch } from '../Interfaces'
@@ -47,15 +45,9 @@ export default function Admin() {
 			return
 		}
 
-		const db = firebase.firestore()
-		const batch = db.batch()
-
 		tbaAxios.get(`event/${eventCode}/teams/simple`).then((res: AxiosResponse<TeamInterface[]>) => {
 			res.data.forEach((doc) => {
-				batch.set(db.collection('teams').doc(doc.key), doc)
 			})
-
-			batch.commit()
 
 			setOpen({
 				type: 'success',
@@ -71,7 +63,6 @@ export default function Admin() {
 		}
 
 		tbaAxios.get(`team/frc${addTeam}/simple`).then((res: AxiosResponse<TeamInterface>) => {
-			firebase.firestore().collection('teams').doc(res.data.key).update(res.data)
 
 			setOpen({
 				type: 'success',
@@ -122,27 +113,7 @@ export default function Admin() {
 
 		console.log('scoutMatches:', scoutMatches)
 
-
-		// firebase.firestore().collection('scoutMatches')
-		let batch = firebase.firestore().batch()
-		let counter = 0
-
-		for await (const scoutMatch of scoutMatches) {
-			const ref = firebase.firestore().collection('scoutMatches').doc(scoutMatch.key)
-			if (counter < 500) {
-				batch.set(ref, scoutMatch)
-				counter += 1
-			} else {
-				await batch.commit()
-				batch = firebase.firestore().batch()
-				counter = 0
-			}
-		}
-
-		batch.commit().then(() => console.log('done!'))
 		// console.log('scoutMatches:', scoutMatches)
-
-		// firebase.firestore().collection('teams').doc(res.data.key).update(res.data)
 
 		// setOpen({
 		// 	type: 'success',
@@ -151,15 +122,6 @@ export default function Admin() {
 	}
 
 	const seedData = async () => {
-		firebase.firestore().collection('scoutMatches').add({
-			compLevel: 'qm',
-			key: 'key1',
-			match: 'match1',
-			side: 'red',
-			status: 'toBeAssigned',
-			team: 'frc4',
-			time: 1,
-		} as ScoutedMatch)
 	}
 
 	const handleClose = (event?: React.SyntheticEvent, reason?: string) => {

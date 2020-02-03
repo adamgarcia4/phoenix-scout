@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import {
 	Button,
 	Typography,
@@ -6,8 +6,6 @@ import {
 	Theme,
 } from '@material-ui/core'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
 import styled from 'styled-components'
 import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
@@ -18,6 +16,8 @@ import {
 	useHistory,
 } from 'react-router-dom'
 import Expansion from '../ui/Expansion'
+import { ScoutedMatch } from 'src/Interfaces'
+import { store } from '../config/store'
 
 const NumberButton = styled.span`
   display: inline-block;
@@ -196,6 +196,7 @@ const EndGameMode = ({
 }
 
 export default function AddMatch() {
+	// TODO: Reducer
 	const [numHighAuto, setNumHighAuto] = useState(0)
 	const [numLowAuto, setNumLowAuto] = useState(0)
 	const [numHighTele, setNumHighTele] = useState(0)
@@ -203,22 +204,39 @@ export default function AddMatch() {
 	const [isColorWheel, setIsColorWheel] = useState(false)
 	const [didClimb, setDidClimb] = useState(false)
 
+	const context = useContext(store)
+
 	const history = useHistory()
 
 	const [expanded, setExpanded] = useState<string | false>('panel1')
 	const classes = useStyles({})
 
 	const submitMatch = () => {
-		firebase.firestore().collection('matches').add({
-			numHighAuto,
-			numLowAuto,
-			numHighTele,
-			numLowTele,
-			isColorWheel,
-			didClimb,
-		})
+		console.log('submit match')
+		const randomNum = Math.round(Math.random() * 1000)
+		const newMatch: ScoutedMatch = {
+			key: `match${randomNum}_frc4`,
+			status: 'inProgress',
+			match: `match${randomNum}`,
+			team: 'frc4',
+			time: Date.now(),
+			compLevel: 'qm',
+			side: 'red',
+			data: {
+				numHighAuto,
+				numLowAuto,
+				numHighTele,
+				numLowTele,
+				isColorWheel,
+				didClimb
+			}
+		}
 
-		history.push('/')
+		context.dispatch({
+			type: 'addData',
+			data: newMatch,
+		})
+		// history.push('/')
 	}
 
 	const isDirty = () => !(

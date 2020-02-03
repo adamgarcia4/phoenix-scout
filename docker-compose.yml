@@ -8,10 +8,10 @@ services:
       target: development
     command: ["npm", "run", "start"]
     ports:
-      - '3000:3000'
+      - '3004:3000'
     volumes:
-      - './frontend/src:/var/build/frontend/src:delegated'
-      - './shared/src:/var/build/shared/src:delegated'
+      - './frontend/src:/workdir/frontend/src:delegated'
+      - './shared/src:/workdir/shared/src:delegated'
     env_file:
       - .env
   backend:

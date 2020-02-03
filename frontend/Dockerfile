@@ -1,12 +1,14 @@
 FROM node:12-alpine as base
 
-WORKDIR /var/build
+WORKDIR /workdir/frontend
 
 #------ PRE-REQS --------
 FROM base as prereq
 
 COPY package*.json ./
 COPY ts*.json ./
+COPY webpack.config.js ./
+COPY ./public/ ./public
 
 RUN npm install --quiet --unsafe-perm --no-progress --no-audit --only=production
 

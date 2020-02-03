@@ -26,6 +26,8 @@ import HomeIcon from '@material-ui/icons/Home'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
 import RedditIcon from '@material-ui/icons/Reddit'
 
+import DataSync from './DataSync'
+
 import {
 	useHistory,
 	useLocation,
@@ -53,6 +55,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 			easing: theme.transitions.easing.easeOut,
 			duration: theme.transitions.duration.enteringScreen,
 		}),
+	},
+	title: {
+		flexGrow: 1,
 	},
 	menuButton: {
 		marginRight: theme.spacing(2),
@@ -119,6 +124,7 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 	return (
 		<div className={classes.root}>
 			<CssBaseline />
+
 			<AppBar
 				position="fixed"
 				className={clsx(classes.appBar, {
@@ -135,9 +141,10 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 					>
 						<MenuIcon />
 					</IconButton>
-					<Typography variant="h6" noWrap>
+					<Typography variant="h6" noWrap className={classes.title}>
             Phoenix Scout
 					</Typography>
+					<DataSync/>
 				</Toolbar>
 			</AppBar>
 			<Drawer

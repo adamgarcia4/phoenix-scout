@@ -19,6 +19,7 @@ export interface HeadersInterface {
 	key: string,
 	align?: 'right',
 	getValue?: Function | undefined,
+	render?: Function,
 }
 
 export interface DataInterface {
@@ -44,8 +45,14 @@ const HeaderComponent = ({ headers }: HeaderComponentProps) => (
 
 const DataComponent = ({ data, headers }: TableProps) => {
 	// eslint-disable-next-line no-shadow
-	const getValue = (row, key: string, getValue: Function | undefined) => {
-		return (getValue && getValue(row[key])) ?? row[key]
+	const getValue = (row: DataInterface, header: HeadersInterface) => {
+		const { key, getValue } = header
+
+		if (getValue) {
+			return getValue(row)
+		}
+
+		return row[key]
 	}
 	
 	return (
@@ -58,7 +65,7 @@ const DataComponent = ({ data, headers }: TableProps) => {
 							align={header.align}
 							key={header.key}
 						>
-							{getValue(row, header.key, header.getValue)}
+							{getValue(row, header)}
 							{/* {row[header.key]} */}
 						</TableCell>
 					))}
