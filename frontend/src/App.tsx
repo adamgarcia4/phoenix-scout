@@ -15,7 +15,7 @@ import Admin from './Pages/Admin'
 import Header from './components/Header'
 import TeamDetail from './Pages/TeamDetail'
 import TeamsPage from './Pages/Teams'
-import { StateProvider } from './config/store'
+import { StateProvider } from './store'
 
 const client = new ApolloClient({
   uri: 'http://localhost:8080/',

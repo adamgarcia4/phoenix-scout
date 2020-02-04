@@ -5,7 +5,7 @@ import { gql } from 'apollo-boost'
 import { useQuery, useLazyQuery } from '@apollo/react-hooks'
 import { ScoutedMatch } from '@shared/Interfaces'
 
-import { store } from '../config/store'
+import { store } from '../store'
 
 const ScoutMatchInitialQuery = gql`
 	{

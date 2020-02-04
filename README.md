@@ -5,6 +5,8 @@ setting up frontend with webpack: https://medium.com/@atingenkay/webpack-4-react
 
 setting up backend, and getting shared modules to work:
 http://engineering.conversantmedia.com/technology/2019/10/01/typescript-hot-reload/
+
+https://tylermcginnis.com/react-router-cannot-get-url-refresh/
 ## Available Scripts
 
 In the project directory, you can run:

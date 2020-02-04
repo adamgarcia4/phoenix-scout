@@ -7,7 +7,7 @@ import TableComponent, { HeadersInterface } from './ui/Table'
 import { ScoutedMatch } from '@shared/Interfaces'
 import Button from '@material-ui/core/Button'
 
-import { store } from './config/store'
+import { store } from './store'
 import { useHistory } from 'react-router-dom'
 import { paths } from "./App";
 
@@ -56,7 +56,7 @@ const Home: React.FC = () => {
 			<Typography variant="h4">
         Assigned to me
 			</Typography>
-			<TableComponent headers={headers} data={value.state.scoutedMatches}/>
+			<TableComponent headers={headers} data={Object.values(value.state.scoutedMatches)}/>
 		</div>
 	)
 }

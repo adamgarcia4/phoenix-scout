@@ -17,7 +17,7 @@ import {
 } from 'react-router-dom'
 import Expansion from '../ui/Expansion'
 import { ScoutedMatch } from 'src/Interfaces'
-import { store } from '../config/store'
+import { store } from '../store'
 
 const NumberButton = styled.span`
   display: inline-block;
@@ -236,7 +236,7 @@ export default function AddMatch() {
 			type: 'addData',
 			data: newMatch,
 		})
-		// history.push('/')
+		history.push('/')
 	}
 
 	const isDirty = () => !(
