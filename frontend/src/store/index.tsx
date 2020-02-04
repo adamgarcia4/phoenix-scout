@@ -33,11 +33,6 @@ import { ScoutedMatch } from 'src/Interfaces';
  * 
  */
 
-interface DispatchFunctionSignature {
-  type: 'addData' | 'refreshData',
-  data?: any
-}
-
 interface State {
   scoutedMatches: { [key: string]: ScoutedMatch },
   queuedKeys: Set<String>,
@@ -51,11 +46,6 @@ type Action = {
   data: ScoutedMatch[],
 }
 
-interface ContextInterface {
-  state: State,
-  dispatch: (test: DispatchFunctionSignature) => any,
-}
-
 const initialState: State = {
   /**
    * This is the actual data as a key/val store
@@ -66,10 +56,6 @@ const initialState: State = {
    */
   queuedKeys: new Set(),
 }
-
-// const store = createContext<ContextInterface | null>(null)
-const store = createContext(null)
-const { Provider } = store
 
 const reducer = (state: State, action: Action): State => {
   switch(action.type) {
@@ -103,10 +89,18 @@ const reducer = (state: State, action: Action): State => {
   };
 }
 
+interface ContextInterface {
+  state: State,
+  dispatch: (test: Action) => any,
+}
+
+const store = createContext<ContextInterface>(null)
+const { Provider } = store
+
 const StateProvider = ( { children } ) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // console.log('state123:', state.scoutedMatches)
+  console.log('state123:', state)
   
   return (
     <Provider

@@ -15,8 +15,7 @@ const Home: React.FC = () => {
 	const value = useContext(store)
 	let history = useHistory()
 
-	// console.log('data:', data)
-	console.log('value.state.scoutedMatches:', value.state.scoutedMatches)
+	// console.log('value.state.scoutedMatches:', value.state.scoutedMatches)
 
 	const headers: HeadersInterface[] = [
 		{
