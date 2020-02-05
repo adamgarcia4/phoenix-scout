@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useState } from 'react'
+import React, { createContext, useReducer, useState, useEffect } from 'react'
 import { ScoutedMatch } from 'src/Interfaces';
 
 /**
@@ -36,6 +36,7 @@ import { ScoutedMatch } from 'src/Interfaces';
 interface State {
   scoutedMatches: { [key: string]: ScoutedMatch },
   queuedKeys: Set<String>,
+  pushData: Boolean,
 }
 
 type Action = {
@@ -44,6 +45,8 @@ type Action = {
 } | {
   type: 'refreshData',
   data: ScoutedMatch[],
+} | {
+  type: 'pushDataToggle',
 }
 
 const initialState: State = {
@@ -55,6 +58,10 @@ const initialState: State = {
    * This is a list of keys of object taht need to be sent to server when sync.
    */
   queuedKeys: new Set(),
+  /**
+   * This is the field that, when set to true, triggers pushing all keys to server
+   */
+  pushData: false,
 }
 
 const reducer = (state: State, action: Action): State => {
@@ -82,7 +89,13 @@ const reducer = (state: State, action: Action): State => {
         scoutedMatches: {
           ...state.scoutedMatches,
           ...newMatchesToAdd,
-        }
+        },
+        pushData: true,
+      }
+    case 'pushDataToggle':
+      return {
+        ...state,
+        pushData: false,
       }
     default:
       throw new Error();
@@ -98,9 +111,24 @@ const store = createContext<ContextInterface>(null)
 const { Provider } = store
 
 const StateProvider = ( { children } ) => {
+  
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log('state123:', state)
+  console.log('state:', state)
+  
+  useEffect(() => {
+    if (
+      state.queuedKeys.size && 
+      state.pushData
+    ) {
+      console.log('DATABASE', state.queuedKeys)
+    }
+
+    dispatch({
+      type: 'pushDataToggle'
+    })
+
+  }, [state.queuedKeys.size, state.pushData])
   
   return (
     <Provider

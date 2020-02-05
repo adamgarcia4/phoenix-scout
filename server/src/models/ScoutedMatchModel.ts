@@ -31,6 +31,13 @@ const get = (filterFunction?: (x: ScoutedMatch) => boolean) => {
 	
 	return filterFunction ? data.filter(filterFunction): data
 }
+
+const set = (scoutedMatches: ScoutedMatch[]) => {
+	for (const match of scoutedMatches) {
+		data.push(match)
+	}
+}
 export default {
 	get,
+	set,
 }

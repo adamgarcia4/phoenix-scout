@@ -1,17 +1,21 @@
-import { ApolloServer } from "apollo-server";
 import * as dotenv from "dotenv";
 import path from 'path'
+import app from './app'
 
 dotenv.config({
 	path: path.resolve(__dirname, '../../../../.env')
 })
 
-import resolvers from './resolvers'
-import typeDefs from './type-defs'
-
-
-const server = new ApolloServer({ resolvers, typeDefs })
-server.listen(process.env.SERVER_PORT).then(({ url }) => console.log(`Server ready at ${url}`))
+/**
+ * Start Express server.
+ */
+app.listen(process.env.SERVER_PORT, () => {
+	console.log(
+			"App is running at http://localhost:%d",
+			process.env.SERVER_PORT
+	);
+	console.log("  Press CTRL-C to stop\n");
+});
 
 if (module.hot) {
 	module.hot.accept()

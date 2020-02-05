@@ -1,58 +1,37 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { Button } from '@material-ui/core'
 
-import { gql } from 'apollo-boost'
-import { useQuery, useLazyQuery } from '@apollo/react-hooks'
 import { ScoutedMatch } from '@shared/Interfaces'
 
+import backendAxios from '../config/backendAxios'
 import { store } from '../store'
-
-const ScoutMatchInitialQuery = gql`
-	{
-		scoutedMatches {
-			key
-			status
-			compLevel
-			time
-			team
-			assignedTo {
-				name
-			}
-		}
-	}
-`
 
 interface ScoutMatchResponse {
 	scoutedMatches?: [ScoutedMatch]
 }
 
 const DataLoader = (props) => {
-	const [loadGreeting, { called, loading, data }] = useLazyQuery<ScoutMatchResponse>(ScoutMatchInitialQuery)
-
 	const value = useContext(store)
-	
-	useEffect(() => {
-		if (!data) {
-			return
-		}
 
-		if (data.scoutedMatches) {
+	const cb = useCallback( async () => {
+			const res = await backendAxios.get('/scoutedMatch')
 			value.dispatch({
 				type: 'refreshData',
-				data: data.scoutedMatches
+				data: res.data
 			})
-		}
-	}, [data])
-	
+		},
+		[],
+	)
+
 	return (
 		<Button
 			variant="contained"
 			color="secondary"
 			onClick={() => {
-				loadGreeting()
+				cb()
 			}}
 		>
-			Pull Data
+			Sync Data
 		</Button>
 	)
 }
