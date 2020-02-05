@@ -3,21 +3,19 @@ import { Router } from 'express'
 import model from '../models/ScoutedMatchModel'
 const router = Router()
 
-router.get('/scoutedMatch', (req, res) => {
+router.get('/', (req, res) => {
 	res.send(model.get())
 })
 
-router.post('/scoutedMatch', ({ body: {
+router.post('/', ({ body: {
 	scoutedMatches
 } }, res) => {
-	
-	console.log('scoutedMatches:', scoutedMatches)
-	
+
+	// TODO: Add data validation
+	// TODO: Replace with Mongoose
 	model.set(scoutedMatches)
 	
 	res.send(model.get())
-	
-	// res.send(model.get())
 })
 
 export default router

@@ -13,6 +13,6 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }))
 
-app.use(scoutedMatchController)
+app.use('/scoutedMatch', scoutedMatchController)
 
 export default app
