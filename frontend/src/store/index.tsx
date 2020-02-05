@@ -94,7 +94,7 @@ const initialState: State = {
 }
 
 const reducer = (state: State, action: Action): State => {
-  console.log('action.type:', action.type)
+  // console.log('action.type:', action.type)
   
   switch(action.type) {
     case 'addData':
@@ -131,6 +131,7 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         isPushNeeded: false,
+        queuedKeys: new Set()
       }
     case 'pushFailed':
       return {
@@ -163,8 +164,6 @@ const { Provider } = store
 const StateProvider = ( { children } ) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  console.log('state:', state)
-
   useEffect(() => {
     dispatch({
       type: 'syncStart'
@@ -173,7 +172,8 @@ const StateProvider = ( { children } ) => {
   
   // This is server-downloading side effect
   useEffect(() => {
-    // If I want to download but I have items left in the queue,
+    // If I want to download but I have items that haven't been pushed yet
+    // left in the queue,
     // first push to server then pull.
     if (state.queuedKeys.size) {
       dispatch({
@@ -182,7 +182,6 @@ const StateProvider = ( { children } ) => {
       return
     }
     if (state.isDownloadNeeded) {
-      console.log('download now!')
       backendAxios.get('/scoutedMatch')
       .then(res => {
         dispatch({
@@ -202,7 +201,6 @@ const StateProvider = ( { children } ) => {
       state.queuedKeys.size && 
       state.isPushNeeded
     ) {
-      console.log('DATABASE', state.queuedKeys)
       const matchesToUpload = []
       for (const key of state.queuedKeys) {
         matchesToUpload.push(state.scoutedMatches[key])
@@ -220,11 +218,9 @@ const StateProvider = ( { children } ) => {
         dispatch({
           type: 'pushFailed'
         })
-        console.log('err:', err)
       })
       
     }
-
   }, [state.queuedKeys.size, state.isPushNeeded])
   
   return (
