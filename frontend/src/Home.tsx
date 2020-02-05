@@ -10,12 +10,11 @@ import Button from '@material-ui/core/Button'
 import { store } from './store'
 import { useHistory } from 'react-router-dom'
 import { paths } from "./App";
+import useLocalStorage from './hooks/useLocalStorage'
 
 const Home: React.FC = () => {
 	const value = useContext(store)
 	let history = useHistory()
-
-	// console.log('value.state.scoutedMatches:', value.state.scoutedMatches)
 
 	const headers: HeadersInterface[] = [
 		{
@@ -39,6 +38,9 @@ const Home: React.FC = () => {
 						variant="contained"
 						color="primary"
 						onClick={() => {
+							setStoredValue(() => {
+								return storedValue + 1
+							})
 							history.push(paths.getAddMatchPage(row.key))
 						}}
 					>
