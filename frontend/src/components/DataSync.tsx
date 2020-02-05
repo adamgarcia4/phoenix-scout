@@ -13,22 +13,20 @@ interface ScoutMatchResponse {
 const DataLoader = (props) => {
 	const value = useContext(store)
 
-	const cb = useCallback( async () => {
-			const res = await backendAxios.get('/scoutedMatch')
-			value.dispatch({
-				type: 'refreshData',
-				data: res.data
-			})
-		},
-		[],
-	)
-
 	return (
 		<Button
 			variant="contained"
 			color="secondary"
 			onClick={() => {
-				cb()
+				// cb()
+				value.dispatch({
+					type: 'syncStart'
+				})
+
+				value.dispatch({
+					type: 'pushStart'
+				})
+				// TODO: Add to dispatch
 			}}
 		>
 			Sync Data

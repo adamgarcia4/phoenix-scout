@@ -38,9 +38,6 @@ const Home: React.FC = () => {
 						variant="contained"
 						color="primary"
 						onClick={() => {
-							setStoredValue(() => {
-								return storedValue + 1
-							})
 							history.push(paths.getAddMatchPage(row.key))
 						}}
 					>

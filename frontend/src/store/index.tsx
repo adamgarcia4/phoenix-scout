@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useState, useEffect } from 'react'
 import { ScoutedMatch } from 'src/Interfaces';
+import backendAxios from '../config/backendAxios'
 
 /**
  * Store is a collection of reducers/value thing.
@@ -35,18 +36,36 @@ import { ScoutedMatch } from 'src/Interfaces';
 
 interface State {
   scoutedMatches: { [key: string]: ScoutedMatch },
-  queuedKeys: Set<String>,
-  pushData: Boolean,
+  queuedKeys: Set<string>,
+  /**
+   * Set to true to push to Backend
+   */
+  isPushNeeded: Boolean,
+  /**
+   * Set to true to pull from Backend
+   */
+  isDownloadNeeded: Boolean,
 }
 
 type Action = {
   type: 'addData',
   data: ScoutedMatch,
 } | {
-  type: 'refreshData',
-  data: ScoutedMatch[],
+  type: 'syncData',
+  // data: ScoutedMatch[],
 } | {
-  type: 'pushDataToggle',
+  type: 'pushStart'
+} | {
+  type: 'pushSuccess'
+} | {
+  type: 'pushFailed'
+} | {
+  type: 'syncStart'
+} | {
+  type: 'syncSuccess'
+} | {
+  type: 'populateServerData',
+  data: ScoutedMatch[]
 }
 
 const initialState: State = {
@@ -61,10 +80,22 @@ const initialState: State = {
   /**
    * This is the field that, when set to true, triggers pushing all keys to server
    */
-  pushData: false,
+  isPushNeeded: false,
+  /**
+   * If set to true, then triggers pulling data from server
+   */
+  isDownloadNeeded: false,
+  /**
+   * 
+   * if push is needed AND download needed, then push should happen first, then
+   * once done, download should happen
+   * 
+   */
 }
 
 const reducer = (state: State, action: Action): State => {
+  console.log('action.type:', action.type)
+  
   switch(action.type) {
     case 'addData':
       // if queuedKeys.has() key, then we can override the data in our store
@@ -75,27 +106,46 @@ const reducer = (state: State, action: Action): State => {
         scoutedMatches: {
           ...state.scoutedMatches,
           [action.data.key]: action.data
-        }
+        },
+        isPushNeeded: true,
       }
-    case 'refreshData':
-      const newMatchesToAdd: { [key: string]: ScoutedMatch } = {}
-
-      for (const scoutedMatch of action.data) {
-        newMatchesToAdd[scoutedMatch.key] = scoutedMatch
+    case 'populateServerData':
+      const matchesToAdd = {}
+      for (const match of action.data) {
+        matchesToAdd[match.key] = match
       }
 
       return {
         ...state,
         scoutedMatches: {
           ...state.scoutedMatches,
-          ...newMatchesToAdd,
-        },
-        pushData: true,
+          ...matchesToAdd,
+        }
       }
-    case 'pushDataToggle':
+    case 'pushStart':
       return {
         ...state,
-        pushData: false,
+        isPushNeeded: true,
+      }
+    case 'pushSuccess':
+      return {
+        ...state,
+        isPushNeeded: false,
+      }
+    case 'pushFailed':
+      return {
+        ...state,
+        isPushNeeded: false,
+      }
+    case 'syncStart': 
+      return {
+        ...state,
+        isDownloadNeeded: true,
+      }
+    case 'syncSuccess':
+      return {
+        ...state,
+        isDownloadNeeded: false,
       }
     default:
       throw new Error();
@@ -111,24 +161,71 @@ const store = createContext<ContextInterface>(null)
 const { Provider } = store
 
 const StateProvider = ( { children } ) => {
-  
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   console.log('state:', state)
+
+  useEffect(() => {
+    dispatch({
+      type: 'syncStart'
+    })
+  }, [])
   
+  // This is server-downloading side effect
+  useEffect(() => {
+    // If I want to download but I have items left in the queue,
+    // first push to server then pull.
+    if (state.queuedKeys.size) {
+      dispatch({
+        type: "pushStart"
+      })
+      return
+    }
+    if (state.isDownloadNeeded) {
+      console.log('download now!')
+      backendAxios.get('/scoutedMatch')
+      .then(res => {
+        dispatch({
+          type: 'populateServerData',
+          data: res.data
+        })
+      })
+      dispatch({
+        type: "syncSuccess"
+      })
+    }
+  }, [state.isDownloadNeeded])
+
+  // This effect syncs changes back up with server
   useEffect(() => {
     if (
       state.queuedKeys.size && 
-      state.pushData
+      state.isPushNeeded
     ) {
       console.log('DATABASE', state.queuedKeys)
+      const matchesToUpload = []
+      for (const key of state.queuedKeys) {
+        matchesToUpload.push(state.scoutedMatches[key])
+      }
+
+      backendAxios.post('/scoutedMatch', {
+        scoutedMatches: matchesToUpload
+      })
+      .then(res => {
+        dispatch({
+          type: 'pushSuccess'
+        })
+      })
+      .catch(err => {
+        dispatch({
+          type: 'pushFailed'
+        })
+        console.log('err:', err)
+      })
+      
     }
 
-    dispatch({
-      type: 'pushDataToggle'
-    })
-
-  }, [state.queuedKeys.size, state.pushData])
+  }, [state.queuedKeys.size, state.isPushNeeded])
   
   return (
     <Provider
