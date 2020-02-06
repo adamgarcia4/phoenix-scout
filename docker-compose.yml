@@ -1,19 +1,19 @@
 version: '3.7'
 services:
-  frontend:
-    container_name: frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: development
-    command: ["npm", "run", "start"]
-    ports:
-      - '3004:3000'
-    volumes:
-      - './frontend/src:/workdir/frontend/src:delegated'
-      - './shared/src:/workdir/shared/src:delegated'
-    env_file:
-      - .env
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: ["npm", "run", "start"]
+  #   ports:
+  #     - '3004:3000'
+  #   volumes:
+  #     - './frontend/src:/workdir/frontend/src:delegated'
+  #     - './shared/src:/workdir/shared/src:delegated'
+  #   env_file:
+  #     - .env
   backend:
     container_name: backend
     build:
@@ -28,3 +28,21 @@ services:
       - './shared/src:/workdir/shared/src:delegated'
     env_file:
       - .env
+    depends_on:
+      - mongo
+  mongo:
+    image: 'mongo'
+    # container_name: 'mongo-db'
+    # environment:
+    #   - MONGO_INITDB_DATABASE=phoenixScout
+    #   - MONGO_INITDB_ROOT_USERNAME=admin
+    #   - MONGO_INITDB_ROOT_PASSWORD=team4Element
+    volumes:
+      - ./data-volume:/data/db
+    ports:
+      - '27017:27017'
+volumes:
+  data-volume:
+    #   - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    #   - ./DB:/data/db
+      # - '27017-27019:27017-27019'

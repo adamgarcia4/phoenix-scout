@@ -20,7 +20,10 @@
           "../shared/src/*"
       ]
     }
-  }
+  },
+  // "files": [
+  //   "../shared/src/Interfaces/global.d.ts"
+  // ]
 }
 
 // {

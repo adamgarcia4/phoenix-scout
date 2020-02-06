@@ -68,6 +68,7 @@ type Action = {
   data: ScoutedMatch[]
 }
 
+// I now have to handle 2-way deletes
 const initialState: State = {
   /**
    * This is the actual data as a key/val store
@@ -128,10 +129,10 @@ const reducer = (state: State, action: Action): State => {
         isPushNeeded: true,
       }
     case 'pushSuccess':
+      state.queuedKeys.clear()
       return {
         ...state,
         isPushNeeded: false,
-        queuedKeys: new Set()
       }
     case 'pushFailed':
       return {
@@ -164,6 +165,7 @@ const { Provider } = store
 const StateProvider = ( { children } ) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
+  // When the app boots up, we should start syncing data.
   useEffect(() => {
     dispatch({
       type: 'syncStart'
