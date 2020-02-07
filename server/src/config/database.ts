@@ -1,23 +1,32 @@
-const mongoose = require("mongoose")
+import mongodb, { MongoClient, Db } from 'mongodb'
 
-const databaseName = "dbName"
+let client: MongoClient
+let db: Db
+let collMapping = {}
 
-class Database {
-  constructor() {
-    console.log('yoos')
-    this._connect()
-  }
+const connect = (cb: Function) => {
+  mongodb.MongoClient.connect(process.env.MONGO_URL, (err, mongoclient) => {
+    if (err) {
+      console.log('err: ', err)
+      return
+    }
 
-  _connect() {
-    mongoose
-      .connect(`${process.env.MONGO_URL}/${databaseName}`)
-      .then(() => {
-        console.log("Database connection successful")
-      })
-      .catch(err => {
-        console.error("Database connection error")
-      })
-  }
+    
+    client = mongoclient
+    db = mongoclient.db()
+
+    collMapping = {
+      matchScout: db.collection('matchScout')
+    }
+    
+    console.log('MONGO Connected')
+    cb()
+  })
 }
 
-module.exports = new Database()
+export {
+  connect,
+  client,
+  db,
+  collMapping,
+}

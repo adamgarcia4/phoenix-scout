@@ -23,10 +23,6 @@ const DataLoader = (props) => {
 					type: 'syncStart'
 				})
 
-				value.dispatch({
-					type: 'pushStart'
-				})
-				// TODO: Add to dispatch
 			}}
 		>
 			Sync Data

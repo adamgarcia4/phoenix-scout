@@ -1,24 +1,15 @@
 import * as dotenv from "dotenv";
 import path from 'path'
 import app from './app'
-import mongoose from 'mongoose'
+import {connect} from './config/database'
+
 dotenv.config({
 	path: path.resolve(__dirname, '../../../../.env')
 })
 
-const connect = () => {
-  mongoose.connect(process.env.MONGO_URL, { 
-		keepAlive: true, 
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	})
-  return mongoose.connection;
-}
 
-const connection = connect()
 
-connection.once('open', () => {
-	console.log('MONGO CONENCTED')
+const startServer = () => {
 	/**
 	 * Start Express server.
 	 */
@@ -29,7 +20,9 @@ connection.once('open', () => {
 		);
 		console.log("  Press CTRL-C to stop\n");
 	});
-})
+}
+
+connect(startServer)
 
 
 if (module.hot) {

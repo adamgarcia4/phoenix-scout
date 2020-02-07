@@ -40,12 +40,13 @@ interface State {
   /**
    * Set to true to push to Backend
    */
-  isPushNeeded: Boolean,
+  isPushNeeded: number,
   /**
    * Set to true to pull from Backend
    */
-  isDownloadNeeded: Boolean,
+  isDownloadNeeded: number,
 }
+
 
 type Action = {
   type: 'addData',
@@ -81,11 +82,11 @@ const initialState: State = {
   /**
    * This is the field that, when set to true, triggers pushing all keys to server
    */
-  isPushNeeded: false,
+  isPushNeeded: 0,
   /**
    * If set to true, then triggers pulling data from server
    */
-  isDownloadNeeded: false,
+  isDownloadNeeded: 0,
   /**
    * 
    * if push is needed AND download needed, then push should happen first, then
@@ -95,7 +96,10 @@ const initialState: State = {
 }
 
 const reducer = (state: State, action: Action): State => {
-  // console.log('action.type:', action.type)
+  console.groupCollapsed(`Reducer ${action.type}`)
+  console.log('state:', state)
+  console.log('action:', action)
+  console.groupEnd()
   
   switch(action.type) {
     case 'addData':
@@ -108,13 +112,15 @@ const reducer = (state: State, action: Action): State => {
           ...state.scoutedMatches,
           [action.data.key]: action.data
         },
-        isPushNeeded: true,
+        isPushNeeded: state.isPushNeeded + 1,
       }
     case 'populateServerData':
       const matchesToAdd = {}
       for (const match of action.data) {
         matchesToAdd[match.key] = match
       }
+
+      console.log('matchesToAdd:', matchesToAdd)
 
       return {
         ...state,
@@ -126,54 +132,54 @@ const reducer = (state: State, action: Action): State => {
     case 'pushStart':
       return {
         ...state,
-        isPushNeeded: true,
+        isPushNeeded: state.isPushNeeded + 1,
       }
     case 'pushSuccess':
       state.queuedKeys.clear()
       return {
         ...state,
-        isPushNeeded: false,
+        isPushNeeded: 0,
       }
     case 'pushFailed':
       return {
         ...state,
-        isPushNeeded: false,
+        // isPushNeeded: false,
       }
     case 'syncStart': 
+      console.log('state:', state)
+    
       return {
         ...state,
-        isDownloadNeeded: true,
+        isDownloadNeeded: state.isDownloadNeeded + 1,
       }
     case 'syncSuccess':
       return {
         ...state,
-        isDownloadNeeded: false,
+        isDownloadNeeded: 0,
       }
     default:
       throw new Error();
   };
 }
-
-interface ContextInterface {
-  state: State,
-  dispatch: (test: Action) => any,
-}
-
-const store = createContext<ContextInterface>(null)
-const { Provider } = store
-
-const StateProvider = ( { children } ) => {
-  const [state, dispatch] = useReducer(reducer, initialState)
-
-  // When the app boots up, we should start syncing data.
+/**
+ * When the app boots up, we should start syncing data.
+ * @param dispatch Function
+ */
+const useSyncOnPageLoad = (dispatch) => {
   useEffect(() => {
+    console.log('Sync on page load')
     dispatch({
       type: 'syncStart'
     })
   }, [])
-  
-  // This is server-downloading side effect
+}
+
+/**
+ * This is server-downloading side effect
+ */
+const useSyncWithBackend = (state: State, dispatch) => {
   useEffect(() => {
+    console.log('Sync with Backend')
     // If I want to download but I have items that haven't been pushed yet
     // left in the queue,
     // first push to server then pull.
@@ -183,6 +189,7 @@ const StateProvider = ( { children } ) => {
       })
       return
     }
+
     if (state.isDownloadNeeded) {
       backendAxios.get('/scoutedMatch')
       .then(res => {
@@ -195,23 +202,35 @@ const StateProvider = ( { children } ) => {
         type: "syncSuccess"
       })
     }
-  }, [state.isDownloadNeeded])
+  }, [state.isDownloadNeeded, state.queuedKeys.size])
+}
 
-  // This effect syncs changes back up with server
+/**
+ * This effect syncs changes back up with server.
+ * Tested, and seems that this pushes once.
+ */
+const usePushToBackend = (state: State, dispatch) => {
   useEffect(() => {
+    console.log('Push to backend')
     if (
       state.queuedKeys.size && 
       state.isPushNeeded
     ) {
       const matchesToUpload = []
+
+      console.log('state.queuedKeys:', state.queuedKeys)
+      
       for (const key of state.queuedKeys) {
         matchesToUpload.push(state.scoutedMatches[key])
       }
 
+      console.log('matchesToUpload:', matchesToUpload)
+      
       backendAxios.post('/scoutedMatch', {
         scoutedMatches: matchesToUpload
       })
       .then(res => {
+        console.log('Successfully pushed')
         dispatch({
           type: 'pushSuccess'
         })
@@ -224,7 +243,31 @@ const StateProvider = ( { children } ) => {
       
     }
   }, [state.queuedKeys.size, state.isPushNeeded])
-  
+}
+
+interface ContextInterface {
+  state: State,
+  dispatch: (test: Action) => any,
+}
+
+const store = createContext<ContextInterface>(null)
+const { Provider } = store
+
+
+
+
+const StateProvider = ( { children } ) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  console.groupCollapsed(`Current`)
+  console.log('state:', state)
+  console.groupEnd()
+
+  // useSyncOnPageLoad(dispatch)
+  useSyncWithBackend(state, dispatch)
+  usePushToBackend(state, dispatch)
+
+  // need to add copy to localstorage hook too
   return (
     <Provider
       value={{ state, dispatch }}
