@@ -8,6 +8,7 @@
 DB/
 frontend/node_modules
 server/node_modules
+/data-volume
 server/dist
 server1/node_modules
 # testing

@@ -44,20 +44,27 @@ interface State {
   /**
    * Set to true to pull from Backend
    */
-  isDownloadNeeded: number,
+  isSyncNeeded: number,
 }
 
-
+/**
+ * 3 main actions:
+ * Add - Add data locally
+ * Push - Push changes to server
+ * Sync - Download changes from server
+ */
 type Action = {
   type: 'addData',
   data: ScoutedMatch,
 } | {
+  type: 'drainQueue',
+} | {
   type: 'syncData',
   // data: ScoutedMatch[],
 } | {
-  type: 'pushStart'
+  type: 'drainStart'
 } | {
-  type: 'pushSuccess'
+  type: 'drainSuccess'
 } | {
   type: 'pushFailed'
 } | {
@@ -65,7 +72,7 @@ type Action = {
 } | {
   type: 'syncSuccess'
 } | {
-  type: 'populateServerData',
+  type: 'addDataWithoutQueue',
   data: ScoutedMatch[]
 }
 
@@ -86,7 +93,7 @@ const initialState: State = {
   /**
    * If set to true, then triggers pulling data from server
    */
-  isDownloadNeeded: 0,
+  isSyncNeeded: 0,
   /**
    * 
    * if push is needed AND download needed, then push should happen first, then
@@ -102,9 +109,12 @@ const reducer = (state: State, action: Action): State => {
   console.groupEnd()
   
   switch(action.type) {
+    /**
+     * Add data to memory and queue
+     * Trigger a drain queue to Database
+     * TODO: To Support multiple documents?
+     */
     case 'addData':
-      // if queuedKeys.has() key, then we can override the data in our store
-      // instead of add as a new document
       return {
         ...state,
         queuedKeys: state.queuedKeys.add(action.data.key),
@@ -114,7 +124,7 @@ const reducer = (state: State, action: Action): State => {
         },
         isPushNeeded: state.isPushNeeded + 1,
       }
-    case 'populateServerData':
+    case 'addDataWithoutQueue':
       const matchesToAdd = {}
       for (const match of action.data) {
         matchesToAdd[match.key] = match
@@ -129,33 +139,37 @@ const reducer = (state: State, action: Action): State => {
           ...matchesToAdd,
         }
       }
-    case 'pushStart':
+    case 'drainStart':
       return {
         ...state,
         isPushNeeded: state.isPushNeeded + 1,
       }
-    case 'pushSuccess':
+    case 'drainSuccess':
       state.queuedKeys.clear()
       return {
         ...state,
         isPushNeeded: 0,
+        // If sync was needed before, repush sync request.
+        // If didn't already need to sync, then dont.
+        isSyncNeeded: state.isSyncNeeded ? state.isSyncNeeded + 1: 0
       }
-    case 'pushFailed':
-      return {
-        ...state,
-        // isPushNeeded: false,
-      }
+    // case 'pushFailed':
+    //   return {
+    //     ...state,
+    //     // isPushNeeded: false,
+    //   }
     case 'syncStart': 
       console.log('state:', state)
     
       return {
         ...state,
-        isDownloadNeeded: state.isDownloadNeeded + 1,
+        isSyncNeeded: state.isSyncNeeded + 1,
       }
     case 'syncSuccess':
       return {
         ...state,
-        isDownloadNeeded: 0,
+        // No need to sync anymore
+        isSyncNeeded: 0,
       }
     default:
       throw new Error();
@@ -175,26 +189,25 @@ const useSyncOnPageLoad = (dispatch) => {
 }
 
 /**
- * This is server-downloading side effect
+ * This is server-downloading side effect.
+ * Before downloading new data, first ensure that no
+ * Items are waiting in the queue
  */
 const useSyncWithBackend = (state: State, dispatch) => {
   useEffect(() => {
     console.log('Sync with Backend')
-    // If I want to download but I have items that haven't been pushed yet
-    // left in the queue,
-    // first push to server then pull.
     if (state.queuedKeys.size) {
       dispatch({
-        type: "pushStart"
+        type: "drainStart"
       })
       return
     }
 
-    if (state.isDownloadNeeded) {
+    if (state.isSyncNeeded) {
       backendAxios.get('/scoutedMatch')
       .then(res => {
         dispatch({
-          type: 'populateServerData',
+          type: 'addDataWithoutQueue',
           data: res.data
         })
       })
@@ -202,14 +215,14 @@ const useSyncWithBackend = (state: State, dispatch) => {
         type: "syncSuccess"
       })
     }
-  }, [state.isDownloadNeeded, state.queuedKeys.size])
+  }, [state.isSyncNeeded, state.queuedKeys.size])
 }
 
 /**
  * This effect syncs changes back up with server.
  * Tested, and seems that this pushes once.
  */
-const usePushToBackend = (state: State, dispatch) => {
+const useDrainQueue = (state: State, dispatch) => {
   useEffect(() => {
     console.log('Push to backend')
     if (
@@ -218,8 +231,6 @@ const usePushToBackend = (state: State, dispatch) => {
     ) {
       const matchesToUpload = []
 
-      console.log('state.queuedKeys:', state.queuedKeys)
-      
       for (const key of state.queuedKeys) {
         matchesToUpload.push(state.scoutedMatches[key])
       }
@@ -230,15 +241,14 @@ const usePushToBackend = (state: State, dispatch) => {
         scoutedMatches: matchesToUpload
       })
       .then(res => {
-        console.log('Successfully pushed')
         dispatch({
-          type: 'pushSuccess'
+          type: 'drainSuccess'
         })
       })
       .catch(err => {
-        dispatch({
-          type: 'pushFailed'
-        })
+        // dispatch({
+        //   type: 'pushFailed'
+        // })
       })
       
     }
@@ -265,7 +275,7 @@ const StateProvider = ( { children } ) => {
 
   // useSyncOnPageLoad(dispatch)
   useSyncWithBackend(state, dispatch)
-  usePushToBackend(state, dispatch)
+  useDrainQueue(state, dispatch)
 
   // need to add copy to localstorage hook too
   return (
