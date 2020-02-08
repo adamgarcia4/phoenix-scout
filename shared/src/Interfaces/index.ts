@@ -42,16 +42,16 @@ export type ScoutedMatch = {
       numLowFailed: number,
       didMove: boolean,
     },
-    tele: {
-      numHighSuccess: number,
-      numHighFailed: number,
-      numLowSuccess: number,
-      numLowFailed: number,
-      fitUnderTrench: boolean,
-      didRotateColorWheel: boolean,
-      didAttemptClimb: boolean,
-      didClimbSuccess: boolean,
-    }
+    // tele: {
+    //   numHighSuccess: number,
+    //   numHighFailed: number,
+    //   numLowSuccess: number,
+    //   numLowFailed: number,
+    //   fitUnderTrench: boolean,
+    //   didRotateColorWheel: boolean,
+    //   didAttemptClimb: boolean,
+    //   didClimbSuccess: boolean,
+    // }
   },
   /**
    * The profile of the scout assigned

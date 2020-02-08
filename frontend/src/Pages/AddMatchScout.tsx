@@ -15,8 +15,11 @@ import Switch from '@material-ui/core/Switch'
 import {
 	useHistory,
 } from 'react-router-dom'
+
+// eslint-disable-next-line
+import { ScoutedMatch } from '@shared/Interfaces'
+
 import Expansion from '../ui/Expansion'
-import { ScoutedMatch } from 'src/Interfaces'
 import { store } from '../store'
 
 const NumberButton = styled.span`
@@ -72,15 +75,16 @@ const BallCountSection = ({
 )
 
 interface AutonModeProps {
-	numHighSuccess: number,
-	setNumHighSuccess: Function
-	numHighFailed: number,
-	setNumHighFailed: Function
-	numLowSuccess: number,
-	setNumLowSuccess: Function
-	numLowFailed: number,
-	setNumLowFailed: Function
-	didMove: boolean,
+	numHighSuccess: number;
+	setNumHighSuccess: Function;
+	numHighFailed: number;
+	setNumHighFailed: Function;
+	numLowSuccess: number;
+	setNumLowSuccess: Function;
+	numLowFailed: number;
+	setNumLowFailed: Function;
+	didMove: boolean;
+	setDidMove: Function;
 }
 
 const AutonMode = ({
@@ -92,17 +96,29 @@ const AutonMode = ({
 	setNumLowSuccess,
 	numLowFailed,
 	setNumLowFailed,
-	didMove: boolean,
-	// numHigh,
-	// setNumHigh,
-	// numLow,
-	// setNumLow,
+	didMove,
+	setDidMove,
 }: AutonModeProps) => {
 	return (
 		<Box display="flex" flexDirection="column">
 			<Typography>
 				Please record results of Auton Here!
 			</Typography>
+			<FormControlLabel
+				control={(
+					<Switch
+						checked={didMove}
+						// TODO: Fix to type safety
+						onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+							setDidMove(checked)
+							return true
+						}}
+						value="checkedB"
+						color="primary"
+					/>
+				)}
+				label="Primary"
+			/>
 			<Box>
 				<BallCountSection
 					title="High Balls Scored"
@@ -111,7 +127,7 @@ const AutonMode = ({
 				/>
 			</Box>
 			<Box>
-			<BallCountSection
+				<BallCountSection
 					title="High Balls Missed"
 					numBalls={numHighFailed}
 					incrementFunction={setNumHighFailed}
@@ -119,9 +135,16 @@ const AutonMode = ({
 			</Box>
 			<Box>
 				<BallCountSection
-					title="Low Balls"
-					numBalls={numLow}
-					incrementFunction={setNumLow}
+					title="Low Balls Scored"
+					numBalls={numLowSuccess}
+					incrementFunction={setNumLowSuccess}
+				/>
+			</Box>
+			<Box>
+				<BallCountSection
+					title="Low Balls Missed"
+					numBalls={numLowFailed}
+					incrementFunction={setNumLowFailed}
 				/>
 			</Box>
 		</Box>
@@ -217,8 +240,12 @@ const EndGameMode = ({
 
 export default function AddMatch() {
 	// TODO: Reducer
-	const [numHighAuto, setNumHighAuto] = useState(0)
-	const [numLowAuto, setNumLowAuto] = useState(0)
+	const [numHighSuccessAuto, setNumHighSuccessAuto] = useState(0)
+	const [numHighFailedAuto, setNumHighFailedAuto] = useState(0)
+	const [numLowSuccessAuto, setNumLowSuccessAuto] = useState(0)
+	const [numLowFailedAuto, setNumLowFailedAuto] = useState(0)
+	const [didMove, setDidMove] = useState(false)
+
 	const [numHighTele, setNumHighTele] = useState(0)
 	const [numLowTele, setNumLowTele] = useState(0)
 	const [isColorWheel, setIsColorWheel] = useState(false)
@@ -241,15 +268,26 @@ export default function AddMatch() {
 			team: 'frc4',
 			time: Date.now(),
 			compLevel: 'qm',
-			side: 'red',
+			side: 'blue',
 			data: {
-				numHighAuto,
-				numLowAuto,
-				numHighTele,
-				numLowTele,
-				isColorWheel,
-				didClimb
-			}
+				auto: {
+					numHighSuccess: numHighSuccessAuto,
+					numHighFailed: numHighFailedAuto,
+					numLowSuccess: numLowSuccessAuto,
+					numLowFailed: numLowFailedAuto,
+					didMove,
+				},
+				// tele: {
+				// numHighSuccess,
+				// numHighFailed,
+				// numLowSuccess,
+				// numLowFailed,
+				// fitUnderTrench,
+				// didRotateColorWheel,
+				// didAttemptClimb,
+				// didClimbSuccess,
+				// },
+			},
 		}
 
 		context.dispatch({
@@ -260,12 +298,11 @@ export default function AddMatch() {
 	}
 
 	const isDirty = () => !(
-		numHighAuto
-    || numLowAuto
-    || numHighTele
-    || numLowTele
-    || isColorWheel
-    || didClimb
+		numHighSuccessAuto
+		|| numHighFailedAuto
+		|| numLowSuccessAuto
+		|| numLowFailedAuto
+		|| didMove
 	)
 
 	const handlePanelChange = (panel: string) => (
@@ -283,10 +320,16 @@ export default function AddMatch() {
 						title: 'Auton Mode',
 						content: (
 							<AutonMode
-								numHigh={numHighAuto}
-								setNumHigh={setNumHighAuto}
-								numLow={numLowAuto}
-								setNumLow={setNumLowAuto}
+								numHighSuccess={numHighSuccessAuto}
+								setNumHighSuccess={setNumHighSuccessAuto}
+								numHighFailed={numHighFailedAuto}
+								setNumHighFailed={setNumHighFailedAuto}
+								numLowSuccess={numLowSuccessAuto}
+								setNumLowSuccess={setNumLowSuccessAuto}
+								numLowFailed={numLowFailedAuto}
+								setNumLowFailed={setNumLowFailedAuto}
+								didMove={didMove}
+								setDidMove={setDidMove}
 							/>
 						),
 					},

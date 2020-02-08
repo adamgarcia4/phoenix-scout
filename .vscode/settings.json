@@ -1,3 +1,7 @@
 {
-	"eslint.enable": true
+	"eslint.enable": true,
+	"eslint.workingDirectories": [
+		"./frontend",
+		"./server"
+	]
 }

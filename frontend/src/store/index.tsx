@@ -1,37 +1,39 @@
-import React, { createContext, useReducer, useState, useEffect } from 'react'
-import { ScoutedMatch } from 'src/Interfaces';
+import React, {
+	createContext, useReducer, useState, useEffect,
+} from 'react'
+import { ScoutedMatch } from '@shared/Interfaces'
 import backendAxios from '../config/backendAxios'
 
 /**
  * Store is a collection of reducers/value thing.
- * 
+ *
  * requirements:
- * 
+ *
  * 1. Action to push new data to state.  This makes
  * UI 100% fluid, with internet or without.
- * 
+ *
  * 2. Option to persist to local storage disk.
  * This will act as the caching while offline.
- * 
+ *
  * Keep track of which documents are also found
  * in the database.  Key value store.  True False
  * Key is document identifier.  Can have a default
  * value of `key`, but be customized.
- * 
+ *
  * When full api fetch made for data, this list is
  * regenerated.
- * 
+ *
  * 3. Action which pushes all unpersisted data
  * to database.  Once a response comes back, the
  * Key/Value store is regenerated.
- * 
+ *
  * Optional function to persist with database
- * 
+ *
  * If State is always a key value store
  * We can push an object and have a default getKey Function
- * 
+ *
  * Get a list of data via Object.values()
- * 
+ *
  */
 
 interface State {
@@ -40,7 +42,7 @@ interface State {
   /**
    * Set to true to push to Backend
    */
-  isPushNeeded: number,
+  isDrainNeeded: number,
   /**
    * Set to true to pull from Backend
    */
@@ -72,120 +74,120 @@ type Action = {
 } | {
   type: 'syncSuccess'
 } | {
-  type: 'addDataWithoutQueue',
+  type: 'addDataWithoutDrain',
   data: ScoutedMatch[]
 }
 
 // I now have to handle 2-way deletes
 const initialState: State = {
-  /**
+	/**
    * This is the actual data as a key/val store
    */
-  scoutedMatches: {},
-  /**
+	scoutedMatches: {},
+	/**
    * This is a list of keys of object taht need to be sent to server when sync.
    */
-  queuedKeys: new Set(),
-  /**
+	queuedKeys: new Set(),
+	/**
    * This is the field that, when set to true, triggers pushing all keys to server
    */
-  isPushNeeded: 0,
-  /**
+	isDrainNeeded: 0,
+	/**
    * If set to true, then triggers pulling data from server
    */
-  isSyncNeeded: 0,
-  /**
-   * 
+	isSyncNeeded: 0,
+	/**
+   *
    * if push is needed AND download needed, then push should happen first, then
    * once done, download should happen
-   * 
+   *
    */
 }
 
 const reducer = (state: State, action: Action): State => {
-  console.groupCollapsed(`Reducer ${action.type}`)
-  console.log('state:', state)
-  console.log('action:', action)
-  console.groupEnd()
-  
-  switch(action.type) {
-    /**
+	console.groupCollapsed(`Reducer ${action.type}`)
+	console.log('state:', state)
+	console.log('action:', action)
+	console.groupEnd()
+
+	switch (action.type) {
+	/**
      * Add data to memory and queue
      * Trigger a drain queue to Database
      * TODO: To Support multiple documents?
      */
-    case 'addData':
-      return {
-        ...state,
-        queuedKeys: state.queuedKeys.add(action.data.key),
-        scoutedMatches: {
-          ...state.scoutedMatches,
-          [action.data.key]: action.data
-        },
-        isPushNeeded: state.isPushNeeded + 1,
-      }
-    case 'addDataWithoutQueue':
-      const matchesToAdd = {}
-      for (const match of action.data) {
-        matchesToAdd[match.key] = match
-      }
+	case 'addData':
+		return {
+			...state,
+			queuedKeys: state.queuedKeys.add(action.data.key),
+			scoutedMatches: {
+				...state.scoutedMatches,
+				[action.data.key]: action.data,
+			},
+			isDrainNeeded: state.isDrainNeeded + 1,
+		}
+	case 'addDataWithoutDrain':
+		const matchesToAdd = {}
+		for (const match of action.data) {
+			matchesToAdd[match.key] = match
+		}
 
-      console.log('matchesToAdd:', matchesToAdd)
+		console.log('matchesToAdd:', matchesToAdd)
 
-      return {
-        ...state,
-        scoutedMatches: {
-          ...state.scoutedMatches,
-          ...matchesToAdd,
-        }
-      }
-    case 'drainStart':
-      return {
-        ...state,
-        isPushNeeded: state.isPushNeeded + 1,
-      }
-    case 'drainSuccess':
-      state.queuedKeys.clear()
-      return {
-        ...state,
-        isPushNeeded: 0,
-        // If sync was needed before, repush sync request.
-        // If didn't already need to sync, then dont.
-        isSyncNeeded: state.isSyncNeeded ? state.isSyncNeeded + 1: 0
-      }
-    // case 'pushFailed':
-    //   return {
-    //     ...state,
-    //     // isPushNeeded: false,
-    //   }
-    case 'syncStart': 
-      console.log('state:', state)
-    
-      return {
-        ...state,
-        isSyncNeeded: state.isSyncNeeded + 1,
-      }
-    case 'syncSuccess':
-      return {
-        ...state,
-        // No need to sync anymore
-        isSyncNeeded: 0,
-      }
-    default:
-      throw new Error();
-  };
+		return {
+			...state,
+			scoutedMatches: {
+				...state.scoutedMatches,
+				...matchesToAdd,
+			},
+		}
+	case 'drainStart':
+		return {
+			...state,
+			isDrainNeeded: state.isDrainNeeded + 1,
+		}
+	case 'drainSuccess':
+		state.queuedKeys.clear()
+		return {
+			...state,
+			isDrainNeeded: 0,
+			// If sync was needed before, repush sync request.
+			// If didn't already need to sync, then dont.
+			isSyncNeeded: state.isSyncNeeded ? state.isSyncNeeded + 1 : 0,
+		}
+		// case 'pushFailed':
+		//   return {
+		//     ...state,
+		//     // isDrainNeeded: false,
+		//   }
+	case 'syncStart':
+		console.log('state:', state)
+
+		return {
+			...state,
+			isSyncNeeded: state.isSyncNeeded + 1,
+		}
+	case 'syncSuccess':
+		return {
+			...state,
+			// No need to sync anymore
+			isSyncNeeded: 0,
+		}
+	default:
+		throw new Error()
+	}
 }
 /**
  * When the app boots up, we should start syncing data.
  * @param dispatch Function
  */
 const useSyncOnPageLoad = (dispatch) => {
-  useEffect(() => {
-    console.log('Sync on page load')
-    dispatch({
-      type: 'syncStart'
-    })
-  }, [])
+	useEffect(() => {
+		console.log('Sync on page load')
+		dispatch({
+			type: 'syncStart',
+		})
+	}, [])
 }
 
 /**
@@ -194,28 +196,28 @@ const useSyncOnPageLoad = (dispatch) => {
  * Items are waiting in the queue
  */
 const useSyncWithBackend = (state: State, dispatch) => {
-  useEffect(() => {
-    console.log('Sync with Backend')
-    if (state.queuedKeys.size) {
-      dispatch({
-        type: "drainStart"
-      })
-      return
-    }
+	useEffect(() => {
+		console.log('Sync with Backend')
+		if (state.queuedKeys.size) {
+			dispatch({
+				type: 'drainStart',
+			})
+			return
+		}
 
-    if (state.isSyncNeeded) {
-      backendAxios.get('/scoutedMatch')
-      .then(res => {
-        dispatch({
-          type: 'addDataWithoutQueue',
-          data: res.data
-        })
-      })
-      dispatch({
-        type: "syncSuccess"
-      })
-    }
-  }, [state.isSyncNeeded, state.queuedKeys.size])
+		if (state.isSyncNeeded) {
+			backendAxios.get('/scoutedMatch')
+				.then((res) => {
+					dispatch({
+						type: 'addDataWithoutDrain',
+						data: res.data,
+					})
+				})
+			dispatch({
+				type: 'syncSuccess',
+			})
+		}
+	}, [state.isSyncNeeded])
 }
 
 /**
@@ -223,36 +225,35 @@ const useSyncWithBackend = (state: State, dispatch) => {
  * Tested, and seems that this pushes once.
  */
 const useDrainQueue = (state: State, dispatch) => {
-  useEffect(() => {
-    console.log('Push to backend')
-    if (
-      state.queuedKeys.size && 
-      state.isPushNeeded
-    ) {
-      const matchesToUpload = []
+	useEffect(() => {
+		console.log('Drain Queue Start')
+		if (
+			state.queuedKeys.size
+      && state.isDrainNeeded
+		) {
+			const matchesToUpload = []
 
-      for (const key of state.queuedKeys) {
-        matchesToUpload.push(state.scoutedMatches[key])
-      }
+			for (const key of state.queuedKeys) {
+				matchesToUpload.push(state.scoutedMatches[key])
+			}
 
-      console.log('matchesToUpload:', matchesToUpload)
-      
-      backendAxios.post('/scoutedMatch', {
-        scoutedMatches: matchesToUpload
-      })
-      .then(res => {
-        dispatch({
-          type: 'drainSuccess'
-        })
-      })
-      .catch(err => {
-        // dispatch({
-        //   type: 'pushFailed'
-        // })
-      })
-      
-    }
-  }, [state.queuedKeys.size, state.isPushNeeded])
+			console.log('matchesToUpload:', matchesToUpload)
+
+			backendAxios.post('/scoutedMatch', {
+				scoutedMatches: matchesToUpload,
+			})
+				.then((res) => {
+					dispatch({
+						type: 'drainSuccess',
+					})
+				})
+				.catch((err) => {
+					// dispatch({
+					//   type: 'pushFailed'
+					// })
+				})
+		}
+	}, [state.isDrainNeeded])
 }
 
 interface ContextInterface {
@@ -264,28 +265,25 @@ const store = createContext<ContextInterface>(null)
 const { Provider } = store
 
 
+const StateProvider = ({ children }) => {
+	const [state, dispatch] = useReducer(reducer, initialState)
 
+	console.groupCollapsed('Current')
+	console.log('state:', state)
+	console.groupEnd()
 
-const StateProvider = ( { children } ) => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+	// useSyncOnPageLoad(dispatch)
+	useSyncWithBackend(state, dispatch)
+	useDrainQueue(state, dispatch)
 
-  console.groupCollapsed(`Current`)
-  console.log('state:', state)
-  console.groupEnd()
-
-  // useSyncOnPageLoad(dispatch)
-  useSyncWithBackend(state, dispatch)
-  useDrainQueue(state, dispatch)
-
-  // need to add copy to localstorage hook too
-  return (
-    <Provider
-      value={{ state, dispatch }}
-    >
-      {children}
-    </Provider>
-  )
-	
-};
+	// need to add copy to localstorage hook too
+	return (
+		<Provider
+			value={{ state, dispatch }}
+		>
+			{children}
+		</Provider>
+	)
+}
 
 export { store, StateProvider }
