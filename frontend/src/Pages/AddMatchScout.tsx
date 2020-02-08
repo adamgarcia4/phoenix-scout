@@ -24,7 +24,6 @@ const NumberButton = styled.span`
   vertical-align: middle;
   width: 50px;
   height: 36px;
-  /* background-color: red; */
   text-align: center;
   line-height: 36px;
 `
@@ -73,17 +72,31 @@ const BallCountSection = ({
 )
 
 interface AutonModeProps {
-  numHigh: number,
-  setNumHigh: Function,
-  numLow: number,
-  setNumLow: Function,
+	numHighSuccess: number,
+	setNumHighSuccess: Function
+	numHighFailed: number,
+	setNumHighFailed: Function
+	numLowSuccess: number,
+	setNumLowSuccess: Function
+	numLowFailed: number,
+	setNumLowFailed: Function
+	didMove: boolean,
 }
 
 const AutonMode = ({
-	numHigh,
-	setNumHigh,
-	numLow,
-	setNumLow,
+	numHighSuccess,
+	setNumHighSuccess,
+	numHighFailed,
+	setNumHighFailed,
+	numLowSuccess,
+	setNumLowSuccess,
+	numLowFailed,
+	setNumLowFailed,
+	didMove: boolean,
+	// numHigh,
+	// setNumHigh,
+	// numLow,
+	// setNumLow,
 }: AutonModeProps) => {
 	return (
 		<Box display="flex" flexDirection="column">
@@ -92,9 +105,16 @@ const AutonMode = ({
 			</Typography>
 			<Box>
 				<BallCountSection
-					title="High Balls"
-					numBalls={numHigh}
-					incrementFunction={setNumHigh}
+					title="High Balls Scored"
+					numBalls={numHighSuccess}
+					incrementFunction={setNumHighSuccess}
+				/>
+			</Box>
+			<Box>
+			<BallCountSection
+					title="High Balls Missed"
+					numBalls={numHighFailed}
+					incrementFunction={setNumHighFailed}
 				/>
 			</Box>
 			<Box>

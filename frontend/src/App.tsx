@@ -8,7 +8,7 @@ import {
 
 import About from './About'
 import Home from './Home'
-import AddMatch from './Pages/AddMatch'
+import AddMatch from './Pages/AddMatchScout'
 import Admin from './Pages/Admin'
 import Header from './components/Header'
 import TeamDetail from './Pages/TeamDetail'

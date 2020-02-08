@@ -35,12 +35,23 @@ export type ScoutedMatch = {
    * This is the actual scouted data
    */
   data?: {
-    numHighAuto: number,
-    numLowAuto: number,
-    numHighTele: number,
-    numLowTele: number,
-    isColorWheel: boolean,
-    didClimb: boolean,
+    auto: {
+      numHighSuccess: number,
+      numHighFailed: number,
+      numLowSuccess: number,
+      numLowFailed: number,
+      didMove: boolean,
+    },
+    tele: {
+      numHighSuccess: number,
+      numHighFailed: number,
+      numLowSuccess: number,
+      numLowFailed: number,
+      fitUnderTrench: boolean,
+      didRotateColorWheel: boolean,
+      didAttemptClimb: boolean,
+      didClimbSuccess: boolean,
+    }
   },
   /**
    * The profile of the scout assigned
