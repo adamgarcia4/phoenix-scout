@@ -18,7 +18,11 @@ const DataLoader = () => {
 			variant="contained"
 			color="secondary"
 			onClick={() => {
+				// TODO: Create single sync that calls all relevant syncs
 				value.scoutedMatch.dispatch({
+					type: 'syncStart',
+				})
+				value.teams.dispatch({
 					type: 'syncStart',
 				})
 			}}

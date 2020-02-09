@@ -11,6 +11,27 @@ const getColl = () => {
 	return db.collection('teams')
 }
 
+router.get('/', async(req, res) => {
+	console.log('hi')
+	const coll = getColl()
+	const data = await coll.find({}).toArray()
+	
+	res.send(data)
+})
+
+router.post('/', async({ body: { data } }, res) => {
+	const coll = getColl()
+
+	if (!data || data.length === 0) {
+		return res.json({
+			data: []
+		})
+	}
+
+	await coll.insertMany(data)
+	return res.send('success')
+})
+
 router.post('/seed', async(req, res) => {
 	const coll = getColl()
 

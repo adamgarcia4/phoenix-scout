@@ -52,7 +52,11 @@ const DataComponent = ({ data, headers }: TableProps) => {
 			return getValue(row)
 		}
 
-		return row[key]
+		const keyArr = key.split('.')
+
+		return keyArr.reduce((base, keyChunk) => {
+			return base[keyChunk]
+		}, row)
 	}
 	
 	return (
