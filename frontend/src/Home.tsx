@@ -53,7 +53,7 @@ const Home: React.FC = () => {
 			<Typography variant="h4">
         Assigned to me
 			</Typography>
-			<TableComponent headers={headers} data={Object.values(value.state.scoutedMatches)} />
+			<TableComponent headers={headers} data={Object.values(value.scoutedMatch.state.documents)} />
 		</div>
 	)
 }

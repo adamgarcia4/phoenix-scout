@@ -43,23 +43,18 @@ router.get('/', async(req, res) => {
 	res.send(data)
 })
 
-router.post('/', async({ body: {
-	scoutedMatches
-} }, res) => {
+router.post('/', async({ body: { data } }, res) => {
 	
 	const coll = getColl()
 
-	console.log('scoutedMatches:', scoutedMatches)
-	
-	if (!scoutedMatches || scoutedMatches.length === 0) {
+	if (!data || data.length === 0) {
 		return res.json({
 			data: []
 		})
 	}
 
-	coll.insertMany(scoutedMatches)
+	await coll.insertMany(data)
 	return res.send('success')
-
 })
 
 

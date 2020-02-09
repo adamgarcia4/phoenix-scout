@@ -290,7 +290,7 @@ export default function AddMatch() {
 			},
 		}
 
-		context.dispatch({
+		context.scoutedMatch.dispatch({
 			type: 'addData',
 			data: newMatch,
 		})

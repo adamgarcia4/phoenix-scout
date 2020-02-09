@@ -36,8 +36,9 @@ import backendAxios from '../config/backendAxios'
  *
  */
 
-interface State {
-  scoutedMatches: { [key: string]: ScoutedMatch },
+
+interface State<T> {
+  documents: { [key: string]: T },
   queuedKeys: Set<string>,
   /**
    * Set to true to push to Backend
@@ -52,38 +53,45 @@ interface State {
 /**
  * 3 main actions:
  * Add - Add data locally
- * Push - Push changes to server
+ * Drain - Push changes to server
  * Sync - Download changes from server
  */
-type Action = {
-  type: 'addData',
-  data: ScoutedMatch,
-} | {
-  type: 'drainQueue',
-} | {
-  type: 'syncData',
-  // data: ScoutedMatch[],
-} | {
-  type: 'drainStart'
-} | {
-  type: 'drainSuccess'
-} | {
-  type: 'pushFailed'
-} | {
-  type: 'syncStart'
-} | {
-  type: 'syncSuccess'
-} | {
-  type: 'addDataWithoutDrain',
-  data: ScoutedMatch[]
-}
+type Action<T> = {
+		type: 'addData',
+		data: T,
+	} |
+	{
+		type: 'addDataWithoutDrain',
+		data: T[]
+	} |
+	{
+		type: 'drainQueue',
+	} |
+	{
+		type: 'syncData',
+	} |
+	{
+		type: 'drainStart'
+	} |
+	{
+		type: 'drainSuccess'
+	} |
+	{
+		type: 'pushFailed'
+	} |
+	{
+		type: 'syncStart'
+	} |
+	{
+		type: 'syncSuccess'
+	}
 
 // I now have to handle 2-way deletes
-const initialState: State = {
+const getInitialState = <T extends any>(): State<T> => ({
 	/**
    * This is the actual data as a key/val store
    */
-	scoutedMatches: {},
+	documents: {},
 	/**
    * This is a list of keys of object taht need to be sent to server when sync.
    */
@@ -102,13 +110,13 @@ const initialState: State = {
    * once done, download should happen
    *
    */
-}
+})
 
-const reducer = (state: State, action: Action): State => {
-	console.groupCollapsed(`Reducer ${action.type}`)
-	console.log('state:', state)
-	console.log('action:', action)
-	console.groupEnd()
+const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> => {
+	// console.groupCollapsed(`Reducer ${action.type}`)
+	// console.log('state:', state)
+	// console.log('action:', action)
+	// console.groupEnd()
 
 	switch (action.type) {
 	/**
@@ -120,8 +128,8 @@ const reducer = (state: State, action: Action): State => {
 		return {
 			...state,
 			queuedKeys: state.queuedKeys.add(action.data.key),
-			scoutedMatches: {
-				...state.scoutedMatches,
+			documents: {
+				...state.documents,
 				[action.data.key]: action.data,
 			},
 			isDrainNeeded: state.isDrainNeeded + 1,
@@ -132,12 +140,10 @@ const reducer = (state: State, action: Action): State => {
 			matchesToAdd[match.key] = match
 		}
 
-		console.log('matchesToAdd:', matchesToAdd)
-
 		return {
 			...state,
-			scoutedMatches: {
-				...state.scoutedMatches,
+			documents: {
+				...state.documents,
 				...matchesToAdd,
 			},
 		}
@@ -195,7 +201,7 @@ const useSyncOnPageLoad = (dispatch) => {
  * Before downloading new data, first ensure that no
  * Items are waiting in the queue
  */
-const useSyncWithBackend = (state: State, dispatch) => {
+const useSyncWithBackend = <T extends any>(state: State<T>, dispatch) => {
 	useEffect(() => {
 		console.log('Sync with Backend')
 		if (state.queuedKeys.size) {
@@ -224,7 +230,7 @@ const useSyncWithBackend = (state: State, dispatch) => {
  * This effect syncs changes back up with server.
  * Tested, and seems that this pushes once.
  */
-const useDrainQueue = (state: State, dispatch) => {
+const useDrainQueue = <T extends any>(state: State<T>, dispatch) => {
 	useEffect(() => {
 		console.log('Drain Queue Start')
 		if (
@@ -234,15 +240,15 @@ const useDrainQueue = (state: State, dispatch) => {
 			const matchesToUpload = []
 
 			for (const key of state.queuedKeys) {
-				matchesToUpload.push(state.scoutedMatches[key])
+				matchesToUpload.push(state.documents[key])
 			}
 
-			console.log('matchesToUpload:', matchesToUpload)
-
 			backendAxios.post('/scoutedMatch', {
-				scoutedMatches: matchesToUpload,
+				data: matchesToUpload,
 			})
-				.then(() => {
+				.then((res) => {
+					console.log('res.data:', res.data)
+
 					dispatch({
 						type: 'drainSuccess',
 					})
@@ -257,15 +263,19 @@ const useDrainQueue = (state: State, dispatch) => {
 }
 
 interface ContextInterface {
-  state: State,
-  dispatch: (test: Action) => any,
+	scoutedMatch: {
+		state: State<ScoutedMatch>,
+		dispatch: (test: Action<ScoutedMatch>) => any,
+	}
 }
 
 const store = createContext<ContextInterface>(null)
 const { Provider } = store
 
 
+// eslint-disable-next-line
 const StateProvider = ({ children }) => {
+	const initialState = getInitialState<ScoutedMatch>()
 	const [state, dispatch] = useReducer(reducer, initialState)
 
 	console.groupCollapsed('Current')
@@ -279,7 +289,12 @@ const StateProvider = ({ children }) => {
 	// need to add copy to localstorage hook too
 	return (
 		<Provider
-			value={{ state, dispatch }}
+			value={{
+				scoutedMatch: {
+					state,
+					dispatch,
+				},
+			}}
 		>
 			{children}
 		</Provider>

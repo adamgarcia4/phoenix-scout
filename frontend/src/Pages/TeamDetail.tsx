@@ -7,7 +7,7 @@ const TeamDetail = () => {
 	const params = useParams<{ teamNum: string }>()
 	const { teamNum } = params
 
-	const teamMatchScoutsArr = Object.values(value.state.scoutedMatches)
+	const teamMatchScoutsArr = Object.values(value.scoutedMatch.state.documents)
 		.filter((match) => {
 			return (
 				match.team === teamNum
@@ -20,7 +20,7 @@ const TeamDetail = () => {
 	return (
 		<div>
 			<h1>{teamNum}</h1>
-			
+
 			{teamMatchScoutsArr.map((match) => {
 				return match.key
 			})}

@@ -1,16 +1,16 @@
-import React, { useContext, useCallback } from 'react'
+import React, { useContext } from 'react'
 import { Button } from '@material-ui/core'
 
 import { ScoutedMatch } from '@shared/Interfaces'
 
-import backendAxios from '../config/backendAxios'
+// import backendAxios from '../config/backendAxios'
 import { store } from '../store'
 
 interface ScoutMatchResponse {
 	scoutedMatches?: [ScoutedMatch]
 }
 
-const DataLoader = (props) => {
+const DataLoader = () => {
 	const value = useContext(store)
 
 	return (
@@ -18,11 +18,9 @@ const DataLoader = (props) => {
 			variant="contained"
 			color="secondary"
 			onClick={() => {
-				// cb()
-				value.dispatch({
-					type: 'syncStart'
+				value.scoutedMatch.dispatch({
+					type: 'syncStart',
 				})
-
 			}}
 		>
 			Sync Data
