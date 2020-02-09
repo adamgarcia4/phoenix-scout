@@ -3,7 +3,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 
-import scoutedMatchController from './controllers/scoutedMatch'
+import { scoutedMatchController, teamsController } from './controllers'
 
 const app = express()
 
@@ -14,5 +14,6 @@ app.use(bodyParser.urlencoded({
 }))
 
 app.use('/scoutedMatch', scoutedMatchController)
+app.use('/teams', teamsController)
 
 export default app

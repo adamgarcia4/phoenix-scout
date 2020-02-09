@@ -1,5 +1,5 @@
 import React, {
-	createContext, useReducer, useState, useEffect,
+	createContext, useReducer, useEffect,
 } from 'react'
 import { ScoutedMatch } from '@shared/Interfaces'
 import backendAxios from '../config/backendAxios'
@@ -242,12 +242,12 @@ const useDrainQueue = (state: State, dispatch) => {
 			backendAxios.post('/scoutedMatch', {
 				scoutedMatches: matchesToUpload,
 			})
-				.then((res) => {
+				.then(() => {
 					dispatch({
 						type: 'drainSuccess',
 					})
 				})
-				.catch((err) => {
+				.catch(() => {
 					// dispatch({
 					//   type: 'pushFailed'
 					// })
@@ -272,7 +272,7 @@ const StateProvider = ({ children }) => {
 	console.log('state:', state)
 	console.groupEnd()
 
-	// useSyncOnPageLoad(dispatch)
+	useSyncOnPageLoad(dispatch)
 	useSyncWithBackend(state, dispatch)
 	useDrainQueue(state, dispatch)
 

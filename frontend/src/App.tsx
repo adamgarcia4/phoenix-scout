@@ -22,7 +22,10 @@ export const paths = {
 		return `add-match/${matchKey}`
 	},
 	teamsPage: '/teams',
-	teamDetailsPage: '/team-detail',
+	teamDetailsPage: {
+		route: '/team-detail/:teamNum',
+		get: (teamNum) => `/team-detail/${teamNum}`,
+	},
 	adminPage: '/admin',
 	homePage: '/',
 	schedulePage: '/schedule',
@@ -42,7 +45,7 @@ const App: React.FC = () => (
 					<Route path={paths.teamsPage}>
 						<TeamsPage />
 					</Route>
-					<Route path={paths.teamDetailsPage}>
+					<Route path={paths.teamDetailsPage.route}>
 						<TeamDetail />
 					</Route>
 					<Route path={paths.adminPage}>

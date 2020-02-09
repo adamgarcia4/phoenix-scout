@@ -18,20 +18,17 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-// import InboxIcon from '@material-ui/icons/MoveToInbox'
-// import MailIcon from '@material-ui/icons/Mail'
 import NoteAddIcon from '@material-ui/icons/NoteAdd'
 import HomeIcon from '@material-ui/icons/Home'
-// import ListAltIcon from '@material-ui/icons/ListAlt'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
 import RedditIcon from '@material-ui/icons/Reddit'
-
-import DataSync from './DataSync'
 
 import {
 	useHistory,
 	useLocation,
 } from 'react-router-dom'
+
+import DataSync from './DataSync'
 
 import { paths } from '../App'
 
@@ -144,7 +141,7 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 					<Typography variant="h6" noWrap className={classes.title}>
             Phoenix Scout
 					</Typography>
-					<DataSync/>
+					<DataSync />
 				</Toolbar>
 			</AppBar>
 			<Drawer
@@ -193,9 +190,9 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 						<ListItemText primary="See Teams" />
 					</ListItem>
 					<ListItem
-						selected={isPath(paths.teamDetailsPage)}
+						selected={isPath(paths.teamDetailsPage.route)}
 						button
-						onClick={() => navigateToPath(paths.teamDetailsPage)}
+						onClick={() => navigateToPath(paths.teamDetailsPage.route)}
 					>
 						<ListItemIcon>
 							<RedditIcon />

@@ -53,5 +53,6 @@ module.exports = {
   //  'react/jsx-first-prop-new-line': 'multiline'
     camelcase: [0],
     'no-console': [0],
+    'import/no-unresolved': [2, { ignore: ['@shared\/.'] }]
   },
 };

@@ -1,20 +1,19 @@
 /* eslint-disable no-param-reassign */
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { Typography } from '@material-ui/core'
 
-import TableComponent, { HeadersInterface } from './ui/Table'
-// import { MatchInterface } from './Interfaces'
-import { ScoutedMatch } from '@shared/Interfaces'
 import Button from '@material-ui/core/Button'
-
-import { store } from './store'
 import { useHistory } from 'react-router-dom'
-import { paths } from "./App";
-import useLocalStorage from './hooks/useLocalStorage'
+
+import { ScoutedMatch } from '@shared/Interfaces'
+
+import TableComponent, { HeadersInterface } from './ui/Table'
+import { store } from './store'
+import { paths } from './App'
 
 const Home: React.FC = () => {
 	const value = useContext(store)
-	let history = useHistory()
+	const history = useHistory()
 
 	const headers: HeadersInterface[] = [
 		{
@@ -23,11 +22,11 @@ const Home: React.FC = () => {
 		},
 		{
 			name: 'Status',
-			key: 'status'
+			key: 'status',
 		},
 		{
 			name: 'Team',
-			key: 'team'
+			key: 'team',
 		},
 		{
 			name: 'Scout',
@@ -44,8 +43,8 @@ const Home: React.FC = () => {
 						Scout Now
 					</Button>
 				)
-			}
-		}
+			},
+		},
 	]
 
 	return (
@@ -54,7 +53,7 @@ const Home: React.FC = () => {
 			<Typography variant="h4">
         Assigned to me
 			</Typography>
-			<TableComponent headers={headers} data={Object.values(value.state.scoutedMatches)}/>
+			<TableComponent headers={headers} data={Object.values(value.state.scoutedMatches)} />
 		</div>
 	)
 }

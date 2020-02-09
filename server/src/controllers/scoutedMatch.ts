@@ -1,6 +1,5 @@
 import { ScoutedMatch } from '@shared/Interfaces';
 import { Router } from 'express'
-import model, {IScoutedMatchModel} from '../models/ScoutedMatchModel'
 
 import { db } from '../config/database'
 
