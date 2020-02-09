@@ -20,7 +20,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
       target: development
-    command: ["npm", "run", "debug"]
+    # command: ["/wait", "&&", "npm", "run", "debug"]
     ports:
       - '8080:8080'
     volumes:
@@ -30,6 +30,8 @@ services:
       - .env
     depends_on:
       - mongo
+    environment:
+      WAIT_HOSTS: mongo:27017
   mongo:
     image: 'mongo'
     volumes:
