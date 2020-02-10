@@ -113,10 +113,10 @@ const getInitialState = <T extends any>(): State<T> => ({
 })
 
 const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> => {
-	// console.groupCollapsed(`Reducer ${action.type}`)
+	console.groupCollapsed(`Reducer ${action.type}`)
 	// console.log('state:', state)
 	// console.log('action:', action)
-	// console.groupEnd()
+	console.groupEnd()
 
 	switch (action.type) {
 	/**
@@ -125,6 +125,11 @@ const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> =>
      * TODO: To Support multiple documents?
      */
 	case 'addData':
+		// console.log('action.data.key:', action.data.key)
+		// console.log('action.data:', action.data)
+
+		// console.log('stateAddData:', state)
+
 		return {
 			...state,
 			queuedKeys: state.queuedKeys.add(action.data.key),
@@ -167,8 +172,6 @@ const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> =>
 		//     // isDrainNeeded: false,
 		//   }
 	case 'syncStart':
-		console.log('state:', state)
-
 		return {
 			...state,
 			isSyncNeeded: state.isSyncNeeded + 1,
@@ -236,7 +239,10 @@ const useDrainQueue = <T extends any>(
 	postFunc: (any) => Promise<any>,
 ) => {
 	useEffect(() => {
-		console.log('Drain Queue Start')
+		// console.log('Drain Queue Start')
+		// console.log('state.queuedKeys:', state.queuedKeys)
+		// console.log('state:', state)
+
 		if (
 			state.queuedKeys.size
       && state.isDrainNeeded
@@ -249,7 +255,7 @@ const useDrainQueue = <T extends any>(
 
 			postFunc(matchesToUpload)
 				.then((res) => {
-					console.log('res.data:', res.data)
+					// console.log('res.data:', res.data)
 
 					dispatch({
 						type: 'drainSuccess',

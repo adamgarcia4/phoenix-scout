@@ -11,13 +11,12 @@ import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Paper from '@material-ui/core/Paper'
 import Switch from '@material-ui/core/Switch'
 import {
 	useHistory,
+	useParams,
 } from 'react-router-dom'
-
-// eslint-disable-next-line
-import { ScoutedMatch } from '@shared/Interfaces'
 
 import Expansion from '../ui/Expansion'
 import { store } from '../store'
@@ -39,6 +38,19 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 		position: 'absolute',
 		right: theme.spacing(2),
 		bottom: theme.spacing(2),
+	},
+	matchSummaryContainer: {
+		padding: '10px',
+		marginBottom: '15px',
+		display: 'flex',
+	},
+	fieldContainer: {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: 1,
+	},
+	fieldContainerLabel: {
+		fontWeight: 'bold',
 	},
 }))
 
@@ -101,9 +113,6 @@ const AutonMode = ({
 }: AutonModeProps) => {
 	return (
 		<Box display="flex" flexDirection="column">
-			<Typography>
-				Please record results of Auton Here!
-			</Typography>
 			<FormControlLabel
 				control={(
 					<Switch
@@ -117,7 +126,7 @@ const AutonMode = ({
 						color="primary"
 					/>
 				)}
-				label="Primary"
+				label="Did Robot Move?"
 			/>
 			<Box>
 				<BallCountSection
@@ -238,9 +247,36 @@ const EndGameMode = ({
 	)
 }
 
+interface IMatchFieldContainer {
+	label: string | number,
+	value: string | number,
+}
+
+const MatchSummaryFieldContainer = (props: IMatchFieldContainer) => {
+	const { label, value } = props
+	const styles = useStyles({})
+
+	return (
+		<div className={styles.fieldContainer}>
+			<span className={styles.fieldContainerLabel}>{label}</span>
+			<span>{value}</span>
+		</div>
+	)
+}
+
 export default function AddMatch() {
-	// TODO: Reducer
-	const [numHighSuccessAuto, setNumHighSuccessAuto] = useState(0)
+	const context = useContext(store)
+
+	const params = useParams()
+	const { matchKey } = params as any
+	// eslint-disable-next-line
+	const scoutedMatch = context.scoutedMatch.state.documents?.[matchKey]
+
+	// TODO: Reducer and initial state from scoutedMatch
+	const [
+		numHighSuccessAuto,
+		setNumHighSuccessAuto,
+	] = useState(scoutedMatch?.data?.auto.numHighSuccess ?? 0)
 	const [numHighFailedAuto, setNumHighFailedAuto] = useState(0)
 	const [numLowSuccessAuto, setNumLowSuccessAuto] = useState(0)
 	const [numLowFailedAuto, setNumLowFailedAuto] = useState(0)
@@ -251,49 +287,42 @@ export default function AddMatch() {
 	const [isColorWheel, setIsColorWheel] = useState(false)
 	const [didClimb, setDidClimb] = useState(false)
 
-	const context = useContext(store)
-
 	const history = useHistory()
 
 	const [expanded, setExpanded] = useState<string | false>('panel1')
 	const classes = useStyles({})
 
 	const submitMatch = () => {
-		console.log('submit match')
-		const randomNum = Math.round(Math.random() * 1000)
-		const newMatch: ScoutedMatch = {
-			key: `match${randomNum}_frc4`,
-			status: 'inProgress',
-			match: `match${randomNum}`,
-			team: 'frc4',
-			time: Date.now(),
-			compLevel: 'qm',
-			side: 'blue',
-			data: {
-				auto: {
-					numHighSuccess: numHighSuccessAuto,
-					numHighFailed: numHighFailedAuto,
-					numLowSuccess: numLowSuccessAuto,
-					numLowFailed: numLowFailedAuto,
-					didMove,
-				},
-				// tele: {
-				// numHighSuccess,
-				// numHighFailed,
-				// numLowSuccess,
-				// numLowFailed,
-				// fitUnderTrench,
-				// didRotateColorWheel,
-				// didAttemptClimb,
-				// didClimbSuccess,
-				// },
+		const newMatchObj = JSON.parse(JSON.stringify(scoutedMatch))
+
+		newMatchObj.data = {
+			auto: {
+				numHighSuccess: numHighSuccessAuto,
+				numHighFailed: numHighFailedAuto,
+				numLowSuccess: numLowSuccessAuto,
+				numLowFailed: numLowFailedAuto,
+				didMove,
 			},
+			// tele: {
+			// numHighSuccess,
+			// numHighFailed,
+			// numLowSuccess,
+			// numLowFailed,
+			// fitUnderTrench,
+			// didRotateColorWheel,
+			// didAttemptClimb,
+			// didClimbSuccess,
+			// },
 		}
+
+		// eslint-disable-next-line no-underscore-dangle
+		delete newMatchObj._id
 
 		context.scoutedMatch.dispatch({
 			type: 'addData',
-			data: newMatch,
+			data: newMatchObj,
 		})
+
 		history.push('/')
 	}
 
@@ -312,8 +341,15 @@ export default function AddMatch() {
 		setExpanded(isExpanded ? panel : false)
 	}
 
+	const styles = useStyles({})
+
 	return (
 		<div className={classes.root}>
+			<Paper className={styles.matchSummaryContainer}>
+				<MatchSummaryFieldContainer label="Side" value={scoutedMatch?.side} />
+				<MatchSummaryFieldContainer label="Team" value={scoutedMatch?.team} />
+				<MatchSummaryFieldContainer label="Match #" value={scoutedMatch?.match} />
+			</Paper>
 			<Expansion
 				sections={[
 					{

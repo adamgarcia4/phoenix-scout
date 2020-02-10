@@ -2,7 +2,7 @@ import { ScoutedMatch } from '@shared/Interfaces';
 import { Router } from 'express'
 
 import { db } from '../config/database'
-
+import { ObjectID, ReplaceWriteOpResult } from 'mongodb'
 const router = Router()
 
 const getColl = () => {
@@ -43,9 +43,15 @@ router.get('/', async(req, res) => {
 	res.send(data)
 })
 
-router.post('/', async({ body: { data } }, res) => {
-	
+interface IPostReq {
+	body: {
+		data: ScoutedMatch[]
+	}
+}
+router.post('/', async(req: IPostReq, res) => {
 	const coll = getColl()
+	
+	const data = req.body.data
 
 	if (!data || data.length === 0) {
 		return res.json({
@@ -53,7 +59,34 @@ router.post('/', async({ body: { data } }, res) => {
 		})
 	}
 
-	await coll.insertMany(data)
+	const updatesArr: Promise<ReplaceWriteOpResult>[] = []
+
+	for (const doc of data) {
+		let res: Promise<ReplaceWriteOpResult> | undefined = undefined
+
+		// Document exists, so need to update the doc.
+		if (doc._id) {
+			const _id = doc._id
+			delete doc._id
+
+			res = coll.replaceOne({
+				_id: new ObjectID(_id)
+			}, doc, {
+				upsert: true
+			})
+		} else {
+			// Document does not exist, so 
+			res = coll.replaceOne({
+				key: doc.key
+			}, doc, {
+				upsert: true,
+			})
+		}
+		updatesArr.push(res)
+	}
+	
+	await Promise.all(updatesArr)
+	
 	return res.send('success')
 })
 

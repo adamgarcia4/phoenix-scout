@@ -12,7 +12,6 @@ const getColl = () => {
 }
 
 router.get('/', async(req, res) => {
-	console.log('hi')
 	const coll = getColl()
 	const data = await coll.find({}).toArray()
 	
@@ -28,6 +27,7 @@ router.post('/', async({ body: { data } }, res) => {
 		})
 	}
 
+	
 	await coll.insertMany(data)
 	return res.send('success')
 })

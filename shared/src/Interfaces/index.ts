@@ -4,6 +4,10 @@ export type User = {
 
 export type ScoutedMatch = {
   /**
+   * Mongo ID
+   */
+  _id?: string,
+  /**
    * Defined as `<MATCHAPI.key>_frc<TbaTeamKey>`
    */
   key: string,
