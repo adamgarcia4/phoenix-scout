@@ -44,6 +44,7 @@ const Home: React.FC = () => {
 					</Button>
 				)
 			},
+			sort: false,
 		},
 	]
 

@@ -54,6 +54,8 @@ module.exports = {
     camelcase: [0],
     'no-console': [0],
     'import/no-unresolved': [2, { ignore: ['@shared\/.'] }],
-    'no-case-declarations': 0
+    'no-case-declarations': 0,
+    "react/jsx-max-props-per-line": [1],
+    'react/jsx-props-no-spreading': 0,
   },
 };
