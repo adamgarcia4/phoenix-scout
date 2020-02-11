@@ -33,19 +33,32 @@ router.post('/', async({ body: { data } }, res) => {
 })
 
 router.post('/seed', async(req, res) => {
-	const coll = getColl()
-
-	// Try to drop collection
-	try {
-		await coll.drop()
-	} catch (err) {
+	const {
+		eventId,
+	} = req.body
+	
+	console.log('eventId:', eventId)
+	
+	if (!eventId) {
+		return res.status(404).json({
+			error: 'cannot find eventId'
+		})
 	}
+	
+	try {
+		const response: AxiosResponse<TeamInterface[]> = await tbaAxios.get(`event/${eventId}/teams/simple`)
 
-	// Get Team Response
-	const response: AxiosResponse<TeamInterface[]> = await tbaAxios.get(`event/2019cala/teams/simple`)
-	await coll.insertMany(response.data)
+		const coll = getColl()
 
-	res.send('Done')
+		// Try to drop collection
+		// await coll.drop()
+		await coll.insertMany(response.data)
+		return res.send('Done!')
+	} catch (err) {
+		console.log('err:', err)
+		
+		return res.status(404).send('cannot enter teams into database')
+	}
 })
 
 export default router

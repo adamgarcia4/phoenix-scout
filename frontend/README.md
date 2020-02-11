@@ -7,6 +7,9 @@ In the project directory, you can run:
 How to type useReducer
 https://www.sumologic.com/blog/react-hook-typescript/
 
+PWA stuff
+https://forum.quasar-framework.org/topic/2560/solved-pwa-force-refresh-when-new-version-released/21
+
 ### `yarn start`
 
 Runs the app in the development mode.<br />

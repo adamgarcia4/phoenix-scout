@@ -2,25 +2,20 @@
 import React, { useState } from 'react'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-// import Snackbar from '@material-ui/core/Snackbar'
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
 import { AxiosResponse } from 'axios'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
-import { Typography, Divider, Paper } from '@material-ui/core'
-
-import styled from 'styled-components'
 
 // import { Theme } from '@material-ui/core'
+import { SnackbarProvider, VariantType, useSnackbar } from 'notistack'
 import tbaAxios from '../../config/tbaAxios'
-import { MatchAPIResponse, TeamInterface, ScoutedMatch } from '../../Interfaces'
-import PaperSection from '../../ui/PaperSection'
+import { TeamInterface } from '../../Interfaces'
 
 import backendAxios from '../../config/backendAxios'
 import {
 	EventSettingsSection, FlexContainer, FlexItem, FlexButton, FlexColumn,
 } from './style'
 
-// https://forum.quasar-framework.org/topic/2560/solved-pwa-force-refresh-when-new-version-released/21
 
 const Alert = (props: AlertProps) =>
 // eslint-disable-next-line
@@ -40,28 +35,30 @@ const useStyles = makeStyles(() => createStyles({
 	},
 }))
 
-export default function Admin() {
+const Admin = () => {
 	const [eventCode, setEventCode] = useState('2019cala')
 	const [addTeam, setAddTeam] = useState('')
+
+	const { enqueueSnackbar } = useSnackbar()
 	const [open, setOpen] = useState<MessageI | false>(false)
 
 	const classes = useStyles({})
 
 
 	const getTeams = () => {
-		const c = window.confirm('Do you really want to import many teams?')
+		const c = window.confirm('Do you really want to import teams?')
 		if (!c) {
 			return
 		}
 
-		tbaAxios.get(`event/${eventCode}/teams/simple`).then((res: AxiosResponse<TeamInterface[]>) => {
-			res.data.forEach((doc) => {
-			})
-
-			setOpen({
-				type: 'success',
-				message: `All ${res.data.length} Teams have been loaded up!`,
-			})
+		backendAxios.post('teams/seed', {
+			eventId: eventCode,
+		}).then((res) => {
+			enqueueSnackbar('Teams successfully uploaded from TBA!', { variant: 'success' })
+		}).catch((err) => {
+			console.log('err:', err)
+			
+			enqueueSnackbar(`Matches Unable to be uploaded from TBA.  Error: ${err}`, { variant: 'error' })
 		})
 	}
 
@@ -85,95 +82,70 @@ export default function Admin() {
 	}
 
 	const seedMatches = async () => {
-		const res = await backendAxios.post('/scoutedMatch/seedEvent', {
-			eventId: eventCode,
-		})
+		const c = window.confirm('Do you really want to import matches?')
+		if (!c) {
+			return
+		}
 
-		console.log('res:', res)
+		try {
+			await backendAxios.post('/scoutedMatch/seedEvent', {
+				eventId: eventCode,
+			})
 
-		// setOpen({
-		// 	type: 'success',
-		// 	message: `Team ${res.data.team_number} has been loaded!`,
-		// })
+			enqueueSnackbar('Matches successfully uploaded from TBA!', { variant: 'success' })
+		} catch (error) {
+			enqueueSnackbar(`Matches Unable to be uploaded from TBA.  Error: ${error}`, { variant: 'error' })
+		}
 	}
 
 	const seedData = async () => {
 	}
 
-	const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
-		if (reason === 'clickaway') {
-			return
-		}
-
-		setOpen(false)
+	const handleClick = (variant: VariantType) => () => {
+		enqueueSnackbar('BUTTON!', { variant })
 	}
 
-	const getAlertSeverity = () => {
-		if (!open) {
-			return undefined
-		}
-
-		if (open.type === 'success') {
-			return 'success'
-		}
-
-		if (open.type === 'error') {
-			return 'error'
-		}
-
-		return 'success'
-	}
 	return (
-		<>
-			{open ? (
-				<Alert onClose={handleClose} severity={getAlertSeverity()} className={classes.alert}>
-					{open.message}
-				</Alert>
-			) : null}
-			<EventSettingsSection
-				header="Event Settings"
-			>
-				<FlexContainer>
-					<FlexItem
-						style={{
-							marginRight: '5px',
-						}}
-					>
-						<TextField
-							label="Event Code"
-							onChange={(event) => {
-								setEventCode(event.target.value)
+		<SnackbarProvider maxSnack={3}>
+			<>
+				<EventSettingsSection
+					header="Event Settings"
+				>
+					<FlexContainer>
+						<FlexItem
+							style={{
+								marginRight: '5px',
 							}}
-							value={eventCode}
-						/>
-					</FlexItem>
-					<FlexColumn style={{ flex: 1, height: '100%' }}>
-						<FlexButton variant="contained" color="primary" size="small" onClick={() => getTeams()}>
-							Fetch Teams
-						</FlexButton>
-						<FlexButton variant="contained" color="primary" size="small" onClick={() => seedMatches()}>
-			        Add Matches
-						</FlexButton>
-					</FlexColumn>
+						>
+							<TextField
+								label="Event Code"
+								onChange={(event) => {
+									setEventCode(event.target.value)
+								}}
+								value={eventCode}
+							/>
+						</FlexItem>
+						<FlexColumn style={{ flex: 1, height: '100%' }}>
+							<FlexButton variant="contained" color="primary" size="small" onClick={() => getTeams()}>
+								Fetch Teams
+							</FlexButton>
+							<FlexButton variant="contained" color="primary" size="small" onClick={() => seedMatches()}>
+								Add Matches
+							</FlexButton>
+						</FlexColumn>
 
 
-				</FlexContainer>
-			</EventSettingsSection>
+					</FlexContainer>
+				</EventSettingsSection>
+			</>
+		</SnackbarProvider>
+	)
+}
 
-
-			<TextField
-				label="Add team"
-				onChange={(event) => {
-					setAddTeam(event.target.value)
-				}}
-				value={addTeam}
-			/>
-			<Button variant="contained" color="primary" onClick={() => addTeamToFb()}>
-        Fetch Team
-			</Button>
-			<Button variant="contained" color="primary" onClick={() => seedData()}>
-        Seed Data
-			</Button>
-		</>
+export default function AdminWrapper() {
+	return (
+		<SnackbarProvider maxSnack={3}>
+			<Admin />
+		</SnackbarProvider>
 	)
 }
