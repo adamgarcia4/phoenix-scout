@@ -289,7 +289,7 @@ export default function AddMatch() {
 
 	// update all state when data comes live
 	useEffect(() => {
-		if (scoutedMatch) {
+		if (scoutedMatch?.data) {
 			setNumHighSuccessAuto(scoutedMatch.data?.auto.numHighSuccess)
 			setNumHighFailedAuto(scoutedMatch.data?.auto.numHighFailed)
 			setNumLowSuccessAuto(scoutedMatch.data?.auto.numLowSuccess)
