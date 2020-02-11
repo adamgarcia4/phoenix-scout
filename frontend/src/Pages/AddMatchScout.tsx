@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import {
 	Button,
 	Typography,
@@ -287,6 +287,17 @@ export default function AddMatch() {
 	const [isColorWheel, setIsColorWheel] = useState(false)
 	const [didClimb, setDidClimb] = useState(false)
 
+	// update all state when data comes live
+	useEffect(() => {
+		if (scoutedMatch) {
+			setNumHighSuccessAuto(scoutedMatch.data?.auto.numHighSuccess)
+			setNumHighFailedAuto(scoutedMatch.data?.auto.numHighFailed)
+			setNumLowSuccessAuto(scoutedMatch.data?.auto.numLowSuccess)
+			setNumLowFailedAuto(scoutedMatch.data?.auto.numLowFailed)
+
+			setDidMove(scoutedMatch.data?.auto.didMove)
+		}
+	}, [scoutedMatch])
 	const history = useHistory()
 
 	const [expanded, setExpanded] = useState<string | false>('panel1')
