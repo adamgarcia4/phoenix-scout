@@ -57,6 +57,7 @@ export type ScoutedMatch = {
     //   didClimbSuccess: boolean,
     // }
   },
+  fromAPI?: boolean,
   /**
    * The profile of the scout assigned
    */

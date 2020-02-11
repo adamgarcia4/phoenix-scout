@@ -1,8 +1,13 @@
-import { ScoutedMatch } from '@shared/Interfaces';
+
+import { AxiosResponse } from 'axios';
+import { ScoutedMatch, MatchAPIResponse } from '@shared/Interfaces';
 import { Router } from 'express'
 
 import { db } from '../config/database'
 import { ObjectID, ReplaceWriteOpResult } from 'mongodb'
+
+import tbaAxios from '../config/tbaAxios'
+
 const router = Router()
 
 const getColl = () => {
@@ -104,6 +109,76 @@ router.post('/seed', async(req, res) => {
 	}
 	await coll.insertMany(initData)
 	res.send('Done')
+})
+
+router.post('/seedEvent', async (req, res) => {
+	const {
+		eventId,
+	} = req.body
+
+	console.log('eventId:', eventId)
+	if (!eventId) {
+		return res.status(404).send('error')
+	}
+	
+	const response: AxiosResponse<MatchAPIResponse[]> = await tbaAxios.get(`/event/${eventId}/matches`)
+
+	const scoutMatches: ScoutedMatch[] = []
+
+	for (const match of response.data) {
+		const { alliances } = match
+
+		if (match.comp_level === 'qm' && alliances) {
+			for (const teamKey of alliances.red.team_keys) {
+				scoutMatches.push({
+					key: `${match.key}_${teamKey}`,
+					match: match.key,
+					time: match.time || 0,
+					team: teamKey,
+					compLevel: match.comp_level,
+					side: 'red',
+					status: 'toBeAssigned',
+					fromAPI: true,
+				})
+			}
+
+			for (const teamKey of alliances.blue.team_keys) {
+				scoutMatches.push({
+					key: `${match.key}_${teamKey}`,
+					match: match.key,
+					time: match.time || 0,
+					team: teamKey,
+					compLevel: match.comp_level,
+					side: 'blue',
+					status: 'toBeAssigned',
+					fromAPI: true,
+				})
+			}
+		}
+	}
+
+	const coll = getColl()
+
+	const bulkReplaceOps: any[] = []
+
+	for (const match of scoutMatches) {
+		bulkReplaceOps.push({
+			replaceOne: {
+				filter: {
+					key: match.key,
+				},
+				replacement: match,
+				upsert: true,
+			}
+		})
+	}
+	
+	const writeResponse = await coll.bulkWrite(bulkReplaceOps)
+
+	console.log('writeResponse:', writeResponse)
+	
+	res.send('true')
+
 })
 
 

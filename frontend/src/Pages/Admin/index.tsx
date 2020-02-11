@@ -6,10 +6,19 @@ import TextField from '@material-ui/core/TextField'
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
 import { AxiosResponse } from 'axios'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
+import { Typography, Divider, Paper } from '@material-ui/core'
+
+import styled from 'styled-components'
 
 // import { Theme } from '@material-ui/core'
-import tbaAxios from '../config/tbaAxios'
-import { MatchAPIResponse, TeamInterface, ScoutedMatch } from '../Interfaces'
+import tbaAxios from '../../config/tbaAxios'
+import { MatchAPIResponse, TeamInterface, ScoutedMatch } from '../../Interfaces'
+import PaperSection from '../../ui/PaperSection'
+
+import backendAxios from '../../config/backendAxios'
+import {
+	EventSettingsSection, FlexContainer, FlexItem, FlexButton, FlexColumn,
+} from './style'
 
 // https://forum.quasar-framework.org/topic/2560/solved-pwa-force-refresh-when-new-version-released/21
 
@@ -63,7 +72,6 @@ export default function Admin() {
 		}
 
 		tbaAxios.get(`team/frc${addTeam}/simple`).then((res: AxiosResponse<TeamInterface>) => {
-
 			setOpen({
 				type: 'success',
 				message: `Team ${res.data.team_number} has been loaded!`,
@@ -77,43 +85,11 @@ export default function Admin() {
 	}
 
 	const seedMatches = async () => {
-		const res: AxiosResponse<MatchAPIResponse[]> = await tbaAxios.get(`/event/${eventCode}/matches`)
+		const res = await backendAxios.post('/scoutedMatch/seedEvent', {
+			eventId: eventCode,
+		})
 
-		const scoutMatches: ScoutedMatch[] = []
-
-		for (const match of res.data) {
-			const { alliances } = match
-
-			if (match.comp_level === 'qm' && alliances) {
-				for (const teamKey of alliances.red.team_keys) {
-					scoutMatches.push({
-						key: `${match.key}_${teamKey}`,
-						match: match.key,
-						time: match.time || 0,
-						team: teamKey,
-						compLevel: match.comp_level,
-						side: 'red',
-						status: 'toBeAssigned',
-					})
-				}
-
-				for (const teamKey of alliances.blue.team_keys) {
-					scoutMatches.push({
-						key: `${match.key}_${teamKey}`,
-						match: match.key,
-						time: match.time || 0,
-						team: teamKey,
-						compLevel: match.comp_level,
-						side: 'blue',
-						status: 'toBeAssigned',
-					})
-				}
-			}
-		}
-
-		console.log('scoutMatches:', scoutMatches)
-
-		// console.log('scoutMatches:', scoutMatches)
+		console.log('res:', res)
 
 		// setOpen({
 		// 	type: 'success',
@@ -154,16 +130,36 @@ export default function Admin() {
 					{open.message}
 				</Alert>
 			) : null}
-			<TextField
-				label="Event Code"
-				onChange={(event) => {
-					setEventCode(event.target.value)
-				}}
-				value={eventCode}
-			/>
-			<Button variant="contained" color="primary" onClick={() => getTeams()}>
-        Fetch Teams
-			</Button>
+			<EventSettingsSection
+				header="Event Settings"
+			>
+				<FlexContainer>
+					<FlexItem
+						style={{
+							marginRight: '5px',
+						}}
+					>
+						<TextField
+							label="Event Code"
+							onChange={(event) => {
+								setEventCode(event.target.value)
+							}}
+							value={eventCode}
+						/>
+					</FlexItem>
+					<FlexColumn style={{ flex: 1, height: '100%' }}>
+						<FlexButton variant="contained" color="primary" size="small" onClick={() => getTeams()}>
+							Fetch Teams
+						</FlexButton>
+						<FlexButton variant="contained" color="primary" size="small" onClick={() => seedMatches()}>
+			        Add Matches
+						</FlexButton>
+					</FlexColumn>
+
+
+				</FlexContainer>
+			</EventSettingsSection>
+
 
 			<TextField
 				label="Add team"
@@ -174,9 +170,6 @@ export default function Admin() {
 			/>
 			<Button variant="contained" color="primary" onClick={() => addTeamToFb()}>
         Fetch Team
-			</Button>
-			<Button variant="contained" color="primary" onClick={() => seedMatches()}>
-        Add Matches
 			</Button>
 			<Button variant="contained" color="primary" onClick={() => seedData()}>
         Seed Data
