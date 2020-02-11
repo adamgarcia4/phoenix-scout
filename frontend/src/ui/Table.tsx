@@ -136,36 +136,61 @@ const TableComponent = ({ headers, data }: TableProps) => {
 	}, [headers])
 
 	const {
+		/**
+		 * Base Table Render Methods
+		 */
+
 		headerGroups,
 		rows,
 		prepareRow,
+
+		/**
+		 * Pagination Table Render Methods
+		 */
+
+		// This is an array of only the rows on this page
+		page,
+		// Updates the number of rows on a page
+		setPageSize,
+		// Go to particular page number
+		gotoPage,
+		state: {
+			pageSize,
+			pageIndex,
+		},
 	} = useTable({
 		columns,
 		data,
-	})
+	},
+	usePagination,
+	)
 
 	console.log('headerGroups:', headerGroups)
 	console.log('rows:', rows)
-
+	console.log('page:', page)
+	
 	return (
 		<>
 			<Paper>
 				<TableContainer>
 					<Table className={classes.table} aria-label="simple table">
 						<HeaderComponent headers={headerGroups} />
-						<DataComponent rows={rows} prepareRow={prepareRow} />
+						<DataComponent rows={page} prepareRow={prepareRow} />
 					</Table>
 				</TableContainer>
 				<TablePagination
-					rowsPerPageOptions={[5, 10, 11, 15]}
+					rowsPerPageOptions={[5, 10, 15]}
 					component="div"
-					count={1}
-					rowsPerPage={20}
-					page={1}
-					onChangePage={(event, page) => {
-
+					count={rows.length}
+					rowsPerPage={pageSize}
+					page={pageIndex}
+					onChangePage={(event, newPage) => {
+						gotoPage(newPage)
 					}}
-					onChangeRowsPerPage={() => {}}
+					onChangeRowsPerPage={(event) => {
+						setPageSize(parseInt(event.target.value, 10))
+						gotoPage(0)
+					}}
 				/>
 			</Paper>
 		</>
