@@ -1,23 +1,25 @@
-import React, { useMemo } from 'react'
+/* eslint-disable react/prop-types */
+import React, { useMemo, useEffect } from 'react'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
-import TableSortLabel from '@material-ui/core/TableSortLabel'
+// import TableSortLabel from '@material-ui/core/TableSortLabel'
 import TablePagination from '@material-ui/core/TablePagination'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
 import { makeStyles } from '@material-ui/core/styles'
+import TextField from '@material-ui/core/TextField'
 
 import {
 	useTable,
-	useGroupBy,
-	useFilters,
-	useSortBy,
-	useExpanded,
+	// useFilters,
+	// useSortBy,
+	// useExpanded,
 	usePagination,
-	HeaderColumn,
+	// HeaderColumn,
+	useGlobalFilter,
 } from 'react-table'
 
 const useStyles = makeStyles({
@@ -52,44 +54,20 @@ interface ILabelProps {
 	header: HeadersInterface
 }
 
-// TODO: Type this out later
 const HeaderComponent = ({ headers }) => {
-	console.log('headers:', headers)
-
-	const Label = (props: ILabelProps) => {
-		const { header } = props
-		if (header.sort === undefined || header.sort) {
-			return (
-				<TableSortLabel
-					onClick={(test) => {
-						console.log('hii')
-					}}
-				>
-					{header.name}
-					{/* {orderBy === headCell.id ? (
-											<span className={classes.visuallyHidden}>
-												{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-											</span>
-										) : null} */}
-				</TableSortLabel>
-			)
-		}
-
-		return (
-			<>
-				{header.name}
-			</>
-		)
-	}
+	// console.log('headers:', headers)
 	return (
 		<TableHead>
 			<TableRow>
-				{headers[0].headers.map((column) => (
-					<TableCell>
-						{column.render('Header')}
-						{/* <Label header={} /> */}
-					</TableCell>
-				))}
+				{headers[0].headers.map((column) => {
+					return (
+						<TableCell
+							key={column.id}
+						>
+							{column.render('Header')}
+						</TableCell>
+					)
+				})}
 			</TableRow>
 		</TableHead>
 	)
@@ -99,7 +77,7 @@ const DataComponent = ({ rows, prepareRow }) => {
 	return (
 		<TableBody>
 			{rows.map(
-				(row, i) => {
+				(row) => {
 					prepareRow(row)
 					return (
 						<TableRow {...row.getRowProps()}>
@@ -157,21 +135,56 @@ const TableComponent = ({ headers, data }: TableProps) => {
 		state: {
 			pageSize,
 			pageIndex,
+			globalFilter,
 		},
+		setGlobalFilter,
 	} = useTable({
 		columns,
 		data,
+		initialState: {
+			globalFilter: '',
+		},
+		globalFilter: (origRows, keysArr, c) => {
+			return origRows.filter((origRow) => {
+				for (const key of keysArr) {
+					if (origRow.original[key] === c) {
+						return true
+					}
+				}
+				return false
+			})
+		},
 	},
-	usePagination,
-	)
+	useGlobalFilter,
+	usePagination)
 
-	console.log('headerGroups:', headerGroups)
-	console.log('rows:', rows)
-	console.log('page:', page)
-	
+	// console.log('globalFilter:', globalFilter)
+	// console.log('headerGroups:', headerGroups)
+	// console.log('rows:', rows)
+	// console.log('page:', page)
+
+	useEffect(() => {
+		if (page.length === 0 && pageIndex !== 0) {
+			gotoPage(0)
+		}
+	}, [page, pageIndex])
+
 	return (
 		<>
-			<Paper>
+			<Paper style={{ padding: '10px' }}>
+				<TextField
+					label="Search"
+					helperText="Search by team. Eg: frc4"
+					variant="outlined"
+					onChange={(event) => {
+						if (!event.target.value) {
+							setGlobalFilter(undefined)
+						} else {
+							setGlobalFilter(event.target.value)
+						}
+					}}
+					value={globalFilter || ''}
+				/>
 				<TableContainer>
 					<Table className={classes.table} aria-label="simple table">
 						<HeaderComponent headers={headerGroups} />

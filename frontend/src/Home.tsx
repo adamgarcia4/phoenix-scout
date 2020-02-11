@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import React, { useContext } from 'react'
-import { Typography } from '@material-ui/core'
+// import { Typography } from '@material-ui/core'
 
 import Button from '@material-ui/core/Button'
 import { useHistory } from 'react-router-dom'
@@ -17,16 +17,16 @@ const Home: React.FC = () => {
 
 	const headers: HeadersInterface[] = [
 		{
-			name: 'Match Name',
-			key: 'key',
-		},
-		{
-			name: 'Status',
-			key: 'status',
+			name: 'Match #',
+			key: 'match',
 		},
 		{
 			name: 'Team',
 			key: 'team',
+		},
+		{
+			name: 'Status',
+			key: 'status',
 		},
 		{
 			name: 'Scout',
@@ -51,9 +51,7 @@ const Home: React.FC = () => {
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
-			<Typography variant="h4">
-        Assigned to me
-			</Typography>
+
 			<TableComponent headers={headers} data={Object.values(value.scoutedMatch.state.documents)} />
 		</div>
 	)
