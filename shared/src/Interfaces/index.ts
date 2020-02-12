@@ -108,6 +108,7 @@ type MatchAlliance = {
  * Response from `/event/{event_key}/matches`
  */
 export type MatchAPIResponse = {
+  _id?: string,
   /**
    * TBA match key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER],
    *  where yyyy is the year, and EVENT_CODE is the event code of the event,

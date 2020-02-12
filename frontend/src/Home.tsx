@@ -13,6 +13,8 @@ import { paths } from './App'
 
 const Home: React.FC = () => {
 	const value = useContext(store)
+	console.log('value.teams.state.documents:', value.matches.state.documents)
+	
 	const history = useHistory()
 
 	const headers: HeadersInterface[] = [

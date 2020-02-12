@@ -1,18 +1,19 @@
 import React, {
 	createContext,
 } from 'react'
-import { ScoutedMatch, TeamInterface } from '@shared/Interfaces'
+import { ScoutedMatch, TeamInterface, MatchAPIResponse } from '@shared/Interfaces'
 import backendAxios from '../config/backendAxios'
 import usePersistReducer, { State, Action } from './usePersistReducer'
 
 interface ISingleReducer<T> {
 	state: State<T>,
-	dispatch: (teset: Action<T>) => any,
+	dispatch: (test: Action<T>) => any,
 }
 
 interface ContextInterface {
 	scoutedMatch: ISingleReducer<ScoutedMatch>,
 	teams: ISingleReducer<TeamInterface>,
+	matches: ISingleReducer<MatchAPIResponse>,
 }
 
 const store = createContext<ContextInterface>(null)
@@ -49,12 +50,26 @@ const StateProvider = ({ children }) => {
 
 	const teamsObj = usePersistReducer<TeamInterface>(getTeams, postTeams)
 
+
+	const getMatches = async () => {
+		const res = await backendAxios.get('/matches')
+		return res.data
+	}
+
+	const postMatches = async (dataToUpload) => {
+		const res = await backendAxios.post('/teams', {
+			data: dataToUpload,
+		})
+		return res
+	}
+	const matchesObj = usePersistReducer<MatchAPIResponse>(getMatches, postMatches)
 	// need to add copy to localstorage hook too
 	return (
 		<Provider
 			value={{
 				scoutedMatch: scoutMatchObj,
 				teams: teamsObj,
+				matches: matchesObj,
 			}}
 		>
 			{children}

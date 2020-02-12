@@ -58,26 +58,7 @@ const Admin = () => {
 		}).catch((err) => {
 			console.log('err:', err)
 			
-			enqueueSnackbar(`Matches Unable to be uploaded from TBA.  Error: ${err}`, { variant: 'error' })
-		})
-	}
-
-	const addTeamToFb = () => {
-		const c = window.confirm('Do you really want to import this team?')
-		if (!c) {
-			return
-		}
-
-		tbaAxios.get(`team/frc${addTeam}/simple`).then((res: AxiosResponse<TeamInterface>) => {
-			setOpen({
-				type: 'success',
-				message: `Team ${res.data.team_number} has been loaded!`,
-			})
-		}).catch(() => {
-			setOpen({
-				type: 'error',
-				message: `Team ${addTeam} could not be loaded!`,
-			})
+			enqueueSnackbar(`Teams Unable to be uploaded from TBA.  Error: ${err}`, { variant: 'error' })
 		})
 	}
 

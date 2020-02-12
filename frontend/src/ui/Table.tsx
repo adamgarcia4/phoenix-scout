@@ -4,7 +4,7 @@ import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
-// import TableSortLabel from '@material-ui/core/TableSortLabel'
+import TableSortLabel from '@material-ui/core/TableSortLabel'
 import TablePagination from '@material-ui/core/TablePagination'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
@@ -64,7 +64,14 @@ const HeaderComponent = ({ headers }) => {
 						<TableCell
 							key={column.id}
 						>
-							{column.render('Header')}
+							<div style={{
+								// display: 'flex',
+								// flexDirection: 'column',
+							}}
+							>
+								<div>{column.render('Header')}</div>
+								{/* <TextField id="standard-search" label="Search" type="search" /> */}
+							</div>
 						</TableCell>
 					)
 				})}
