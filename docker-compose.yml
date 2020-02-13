@@ -1,26 +1,25 @@
 version: '3.7'
 services:
-  # frontend:
-  #   container_name: frontend
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #     target: development
-  #   command: ["npm", "run", "start"]
-  #   ports:
-  #     - '3004:3000'
-  #   volumes:
-  #     - './frontend/src:/workdir/frontend/src:delegated'
-  #     - './shared/src:/workdir/shared/src:delegated'
-  #   env_file:
-  #     - .env
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    command: yarn start
+    ports:
+      - '3004:3000'
+    volumes:
+      - './frontend/src:/workdir/frontend/src:delegated'
+      - './shared/src:/workdir/shared/src:delegated'
+    env_file:
+      - .env
   backend:
     container_name: backend
     build:
       context: ./server
       dockerfile: Dockerfile
       target: development
-    # command: ["/wait", "&&", "npm", "run", "debug"]
     ports:
       - '8080:8080'
     volumes:
