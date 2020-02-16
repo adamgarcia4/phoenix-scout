@@ -17,13 +17,15 @@ import { StateProvider } from './store'
 
 export const paths = {
 	aboutPage: '/about',
-	addMatchPage: '/add-match/:matchKey',
-	getAddMatchPage: (matchKey) => {
-		return `add-match/${matchKey}`
+	addMatchPage: {
+		route: '/match/:matchKey/scout/:teamNum',
+		get: (matchKey, teamNum) => {
+			return `match/${matchKey}/scout/${teamNum}`
+		},
 	},
 	teamsPage: '/teams',
 	teamDetailsPage: {
-		route: '/team-detail/:teamNum',
+		route: '/team-detail/:teamNum/',
 		get: (teamNum) => `/team-detail/${teamNum}`,
 	},
 	adminPage: '/admin',
@@ -39,7 +41,7 @@ const App: React.FC = () => (
 					<Route path={paths.aboutPage}>
 						<About />
 					</Route>
-					<Route path={paths.addMatchPage}>
+					<Route path={paths.addMatchPage.route}>
 						<AddMatch />
 					</Route>
 					<Route path={paths.teamsPage}>

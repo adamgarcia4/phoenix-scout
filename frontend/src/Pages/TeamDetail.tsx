@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { useParams } from 'react-router-dom'
-import Paper from '@material-ui/core/Paper'
+// import Paper from '@material-ui/core/Paper'
 import { ScoutedMatch } from '@shared/Interfaces'
 import { store } from '../store'
 import Table from '../ui/Table'

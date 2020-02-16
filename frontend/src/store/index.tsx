@@ -34,7 +34,10 @@ const StateProvider = ({ children }) => {
 		return res
 	}
 
-	const scoutMatchObj = usePersistReducer<ScoutedMatch>(getScoutedMatch, postScoutedMatch)
+	const scoutMatchObj = usePersistReducer<ScoutedMatch>({
+		get: getScoutedMatch,
+		post: postScoutedMatch,
+	})
 
 	const getTeams = async () => {
 		const res = await backendAxios.get('/teams')
@@ -48,8 +51,10 @@ const StateProvider = ({ children }) => {
 		return res
 	}
 
-	const teamsObj = usePersistReducer<TeamInterface>(getTeams, postTeams)
-
+	const teamsObj = usePersistReducer<TeamInterface>({
+		get: getTeams,
+		post: postTeams,
+	})
 
 	const getMatches = async () => {
 		const res = await backendAxios.get('/matches')
@@ -62,7 +67,10 @@ const StateProvider = ({ children }) => {
 		})
 		return res
 	}
-	const matchesObj = usePersistReducer<MatchAPIResponse>(getMatches, postMatches)
+	const matchesObj = usePersistReducer<MatchAPIResponse>({
+		get: getMatches,
+		post: postMatches,
+	})
 	// need to add copy to localstorage hook too
 	return (
 		<Provider

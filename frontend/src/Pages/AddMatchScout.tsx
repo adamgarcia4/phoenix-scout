@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { useState, useContext, useEffect } from 'react'
 import {
 	Button,
@@ -18,6 +19,10 @@ import {
 	useParams,
 } from 'react-router-dom'
 
+import {
+	ScoutedMatch,
+	MatchAPIResponse,
+} from '@shared/Interfaces'
 import Expansion from '../ui/Expansion'
 import { store } from '../store'
 
@@ -264,19 +269,62 @@ const MatchSummaryFieldContainer = (props: IMatchFieldContainer) => {
 	)
 }
 
+const getSide = (matchDetails, teamNum) => {
+	const sideForTeamObj = Object
+		.keys(matchDetails?.alliances || {})
+		.reduce((base, side) => {
+			for (const teamKey of matchDetails.alliances[side].team_keys) {
+			// eslint-disable-next-line no-param-reassign
+				base[teamKey] = side
+			}
+
+			return base
+		}, {})
+
+	return sideForTeamObj[teamNum]
+}
+
+interface ISummaryProps {
+	matchDetails?: MatchAPIResponse,
+	teamNum: string
+}
+const Summary = ({
+	matchDetails,
+	teamNum,
+}: ISummaryProps) => {
+	return (
+		<>
+			<MatchSummaryFieldContainer label="Side" value={getSide(matchDetails, teamNum)} />
+			<MatchSummaryFieldContainer label="Team" value={teamNum} />
+			<MatchSummaryFieldContainer label="Match #" value={`${matchDetails?.comp_level} ${matchDetails?.match_number}`} />
+		</>
+	)
+}
 export default function AddMatch() {
 	const context = useContext(store)
 
 	const params = useParams()
-	const { matchKey } = params as any
-	// eslint-disable-next-line
-	const scoutedMatch = context.scoutedMatch.state.documents?.[matchKey]
+
+	const { matchKey, teamNum } = params as any
+
+
+	const matchDetails = context.matches.state.documents?.[matchKey]
+
+	const scoutMatchKey = `${matchKey}_${teamNum}`
+	console.log('scoutMatchKey:', scoutMatchKey)
+
+	const scoutedMatch = context.scoutedMatch.state.documents?.[scoutMatchKey]
+
+	console.log('scoutedMatch:', scoutedMatch)
+
 
 	// TODO: Reducer and initial state from scoutedMatch
+
 	const [
 		numHighSuccessAuto,
 		setNumHighSuccessAuto,
 	] = useState(scoutedMatch?.data?.auto.numHighSuccess ?? 0)
+
 	const [numHighFailedAuto, setNumHighFailedAuto] = useState(0)
 	const [numLowSuccessAuto, setNumLowSuccessAuto] = useState(0)
 	const [numLowFailedAuto, setNumLowFailedAuto] = useState(0)
@@ -304,15 +352,21 @@ export default function AddMatch() {
 	const classes = useStyles({})
 
 	const submitMatch = () => {
-		const newMatchObj = JSON.parse(JSON.stringify(scoutedMatch))
-
-		newMatchObj.data = {
-			auto: {
-				numHighSuccess: numHighSuccessAuto,
-				numHighFailed: numHighFailedAuto,
-				numLowSuccess: numLowSuccessAuto,
-				numLowFailed: numLowFailedAuto,
-				didMove,
+		// const newMatchObj = JSON.parse(JSON.stringify(scoutedMatch))
+		const newMatchObj: ScoutedMatch = {
+			key: `${matchDetails.key}_${teamNum}`,
+			match: matchKey,
+			team: teamNum,
+			compLevel: matchDetails.comp_level,
+			side: getSide(matchDetails, teamNum),
+			data: {
+				auto: {
+					numHighSuccess: numHighSuccessAuto,
+					numHighFailed: numHighFailedAuto,
+					numLowSuccess: numLowSuccessAuto,
+					numLowFailed: numLowFailedAuto,
+					didMove,
+				},
 			},
 			// tele: {
 			// numHighSuccess,
@@ -325,9 +379,6 @@ export default function AddMatch() {
 			// didClimbSuccess,
 			// },
 		}
-
-		// eslint-disable-next-line no-underscore-dangle
-		delete newMatchObj._id
 
 		context.scoutedMatch.dispatch({
 			type: 'addData',
@@ -357,9 +408,10 @@ export default function AddMatch() {
 	return (
 		<div className={classes.root}>
 			<Paper className={styles.matchSummaryContainer}>
-				<MatchSummaryFieldContainer label="Side" value={scoutedMatch?.side} />
-				<MatchSummaryFieldContainer label="Team" value={scoutedMatch?.team} />
-				<MatchSummaryFieldContainer label="Match #" value={scoutedMatch?.match} />
+				<Summary
+					matchDetails={matchDetails}
+					teamNum={teamNum}
+				/>
 			</Paper>
 			<Expansion
 				sections={[

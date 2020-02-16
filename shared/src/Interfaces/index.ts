@@ -11,10 +11,10 @@ export type ScoutedMatch = {
    * Defined as `<MATCHAPI.key>_frc<TbaTeamKey>`
    */
   key: string,
-  /**
-   * Shows what state the scouted match is in.
-   */
-  status: 'toBeAssigned' | 'assigned' | 'notScouted' | 'inProgress' | 'scouted',
+  // /**
+  //  * Shows what state the scouted match is in.
+  //  */
+  // status: 'toBeAssigned' | 'assigned' | 'notScouted' | 'inProgress' | 'scouted',
   /**
    * Match Key identifier.
    */
@@ -23,10 +23,10 @@ export type ScoutedMatch = {
    * Team Key identifier
    */
   team: string,
-  /**
-   * Start time of match, as set by the FIRST schedule.
-   */
-  time: number,
+  // /**
+  //  * Start time of match, as set by the FIRST schedule.
+  //  */
+  // time: number,
   /**
    * The competition level the match was played at.
    */
@@ -57,11 +57,11 @@ export type ScoutedMatch = {
     //   didClimbSuccess: boolean,
     // }
   },
-  fromAPI?: boolean,
+  // fromAPI?: boolean,
   /**
    * The profile of the scout assigned
    */
-  assignedTo?: User
+  // assignedTo?: User
 }
 
 /* eslint-disable camelcase */

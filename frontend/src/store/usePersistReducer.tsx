@@ -3,7 +3,6 @@ import {
 	useEffect,
 } from 'react'
 
-
 /**
  * Store is a collection of reducers/value thing.
  *
@@ -35,7 +34,6 @@ import {
  * Get a list of data via Object.values()
  *
  */
-
 
 export interface State<T> {
   documents: { [key: string]: T },
@@ -112,12 +110,18 @@ const getInitialState = <T extends any>(): State<T> => ({
    */
 })
 
-const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> => {
-	console.groupCollapsed(`Reducer ${action.type}`)
+// eslint-disable-next-line max-len
+const reducer = <T extends any>(props: IPersistProps<T>) => (state: State<T>, action: Action<T>): State<T> => {
+	// console.groupCollapsed(`Reducer ${action.type}`)
 	// console.log('state:', state)
 	// console.log('action:', action)
-	console.groupEnd()
+	// console.groupEnd()
 
+	const getSerializedKey = props.getSerializedKey
+		? props.getSerializedKey
+		: (data) => {
+			return data.key
+		}
 	switch (action.type) {
 	/**
      * Add data to memory and queue
@@ -129,20 +133,20 @@ const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> =>
 		// console.log('action.data:', action.data)
 
 		// console.log('stateAddData:', state)
-
 		return {
 			...state,
-			queuedKeys: state.queuedKeys.add(action.data.key),
+			queuedKeys: state.queuedKeys.add(getSerializedKey(action.data)),
 			documents: {
 				...state.documents,
-				[action.data.key]: action.data,
+				[getSerializedKey(action.data)]: action.data,
 			},
 			isDrainNeeded: state.isDrainNeeded + 1,
 		}
 	case 'addDataWithoutDrain':
 		const matchesToAdd = {}
+
 		for (const match of action.data) {
-			matchesToAdd[match.key] = match
+			matchesToAdd[getSerializedKey(match)] = match
 		}
 
 		return {
@@ -192,7 +196,7 @@ const reducer = <T extends any>(state: State<T>, action: Action<T>): State<T> =>
  */
 const useSyncOnPageLoad = (dispatch) => {
 	useEffect(() => {
-		console.log('Sync on page load')
+		// console.log('Sync on page load')
 		dispatch({
 			type: 'syncStart',
 		})
@@ -206,7 +210,7 @@ const useSyncOnPageLoad = (dispatch) => {
  */
 const useSyncWithBackend = <T extends any>(state: State<T>, dispatch, getFunc) => {
 	useEffect(() => {
-		console.log('Sync with Backend')
+		// console.log('Sync with Backend')
 		if (state.queuedKeys.size) {
 			dispatch({
 				type: 'drainStart',
@@ -254,7 +258,7 @@ const useDrainQueue = <T extends any>(
 			}
 
 			postFunc(matchesToUpload)
-				.then((res) => {
+				.then(() => {
 					// console.log('res.data:', res.data)
 
 					dispatch({
@@ -270,24 +274,28 @@ const useDrainQueue = <T extends any>(
 	}, [state.isDrainNeeded])
 }
 
+
+interface IPersistProps<T> {
+	get: () => Promise<T[]>,
+	post: (any) => Promise<any>,
+	getSerializedKey?: (doc: T) => string,
+}
 interface IPersist<T> {
 	state: State<T>,
 	dispatch: (test: Action<T>) => any,
 }
-export default function usePersistReducer<T>(
-	getFunc: () => Promise<T[]>,
-	postFunc: (any) => Promise<any>,
-):IPersist<T> {
+export default function usePersistReducer<T>(props: IPersistProps<T>):IPersist<T> {
 	const initialState = getInitialState<T>()
-	const [state, dispatch] = useReducer(reducer, initialState)
+
+	const [state, dispatch] = useReducer(reducer(props), initialState)
 
 	// console.groupCollapsed('Current')
 	// console.log('state:', state)
 	// console.groupEnd()
 
 	useSyncOnPageLoad(dispatch)
-	useSyncWithBackend(state, dispatch, getFunc)
-	useDrainQueue(state, dispatch, postFunc)
+	useSyncWithBackend(state, dispatch, props.get)
+	useDrainQueue(state, dispatch, props.post)
 
 	return {
 		state,

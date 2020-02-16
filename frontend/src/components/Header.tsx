@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import clsx from 'clsx'
 import {
 	makeStyles, useTheme, createStyles, Theme,
@@ -23,11 +23,14 @@ import HomeIcon from '@material-ui/icons/Home'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
 import RedditIcon from '@material-ui/icons/Reddit'
 
+import Select from 'react-select'
+
 import {
 	useHistory,
 	useLocation,
 } from 'react-router-dom'
 
+import { store } from '../store'
 import DataSync from './DataSync'
 
 import { paths } from '../App'
@@ -101,6 +104,7 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 
 	const history = useHistory()
 	const location = useLocation()
+	const value = useContext(store)
 
 	const [open, setOpen] = React.useState(false)
 
@@ -118,6 +122,18 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 	}
 
 	const isPath = (path: string) => path === location.pathname
+
+	const teamsSelectOptions = Object.values(value.teams.state.documents)
+		.map((team) => {
+			return {
+				value: team.key,
+				label: `Team ${team.team_number}: ${team.nickname}`,
+				teamNumber: team.team_number,
+			}
+		})
+		.sort((a, b) => {
+			return a.teamNumber - b.teamNumber
+		})
 
 	return (
 		<div className={classes.root}>
@@ -142,6 +158,23 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 					<Typography variant="h6" noWrap className={classes.title}>
             Phoenix Scout
 					</Typography>
+					<Select
+						styles={{
+							container: (provided, state) => ({
+								...provided,
+								marginRight: '20px',
+								width: '300px',
+								color: 'black',
+							}),
+						}}
+						isClearable
+						options={teamsSelectOptions}
+						onChange={(res: any) => {
+							if (res) {
+								history.push(paths.teamDetailsPage.get(res.value))
+							}
+						}}
+					/>
 					<DataSync />
 				</Toolbar>
 			</AppBar>
@@ -191,19 +224,9 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 						<ListItemText primary="See Teams" />
 					</ListItem>
 					<ListItem
-						selected={isPath(paths.teamDetailsPage.route)}
+						selected={isPath(paths.addMatchPage.route)}
 						button
-						onClick={() => navigateToPath(paths.teamDetailsPage.route)}
-					>
-						<ListItemIcon>
-							<RedditIcon />
-						</ListItemIcon>
-						<ListItemText primary="See Team Details" />
-					</ListItem>
-					<ListItem
-						selected={isPath(paths.addMatchPage)}
-						button
-						onClick={() => navigateToPath(paths.addMatchPage)}
+						onClick={() => navigateToPath(paths.addMatchPage.route)}
 					>
 						<ListItemIcon>
 							<NoteAddIcon />

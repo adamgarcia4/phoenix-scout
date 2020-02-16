@@ -17,27 +17,27 @@ const getColl = () => {
 const initData: ScoutedMatch[] = [
 	{
 		key: 'match1',
-		status: 'toBeAssigned',
+		// status: 'toBeAssigned',
 		compLevel: 'qm',
 		match: 'match1',
 		side: 'blue',
 		team: 'frc4',
-		time: new Date().valueOf(),
-		assignedTo: {
-			name: 'Adam Garcia',
-		},
+		// time: new Date().valueOf(),
+		// assignedTo: {
+		// 	name: 'Adam Garcia',
+		// },
 	},
 	{
 		key: 'match2',
-		status: 'toBeAssigned',
+		// status: 'toBeAssigned',
 		compLevel: 'qm',
 		match: 'match2',
 		side: 'red',
 		team: 'frc254',
-		time: new Date().valueOf(),
-		assignedTo: {
-			name: 'Daniel',
-		},
+		// time: new Date().valueOf(),
+		// assignedTo: {
+		// 	name: 'Daniel',
+		// },
 	},
 ]
 
@@ -134,12 +134,12 @@ router.post('/seedEvent', async (req, res) => {
 					scoutMatches.push({
 						key: `${match.key}_${teamKey}`,
 						match: match.key,
-						time: match.time || 0,
+						// time: match.time || 0,
 						team: teamKey,
 						compLevel: match.comp_level,
 						side: 'red',
-						status: 'toBeAssigned',
-						fromAPI: true,
+						// status: 'toBeAssigned',
+						// fromAPI: true,
 					})
 				}
 
@@ -147,12 +147,12 @@ router.post('/seedEvent', async (req, res) => {
 					scoutMatches.push({
 						key: `${match.key}_${teamKey}`,
 						match: match.key,
-						time: match.time || 0,
+						// time: match.time || 0,
 						team: teamKey,
 						compLevel: match.comp_level,
 						side: 'blue',
-						status: 'toBeAssigned',
-						fromAPI: true,
+						// status: 'toBeAssigned',
+						// fromAPI: true,
 					})
 				}
 			}
