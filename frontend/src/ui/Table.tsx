@@ -188,7 +188,7 @@ const TableComponent = ({ headers, data, options }: TableProps) => {
 					}}
 					value={globalFilter || ''}
 				/>
-				<TableContainer>
+				<TableContainer style={{ minHeight: '400px' }}>
 					<Table className={classes.table} aria-label="simple table">
 						<HeaderComponent headers={headerGroups} />
 						<DataComponent rows={page} prepareRow={prepareRow} />
