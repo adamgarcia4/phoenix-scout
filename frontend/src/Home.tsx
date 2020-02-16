@@ -5,12 +5,17 @@ import React, { useContext, useState } from 'react'
 import Button from '@material-ui/core/Button'
 import { useHistory } from 'react-router-dom'
 
-import { MatchAPIResponse } from '@shared/Interfaces'
+import { MatchAPIResponse, ScoutedMatch } from '@shared/Interfaces'
 import Select from 'react-select'
 import TableComponent, { HeadersInterface } from './ui/Table'
 import { store } from './store'
 import { paths } from './App'
 
+const getScoutedMatchesForMatch = (allScoutedMatches: ScoutedMatch[], matchKey: string) => {
+	return allScoutedMatches.filter((scoutedMatch) => {
+		return scoutedMatch.match === matchKey
+	})
+}
 const Home: React.FC = () => {
 	const value = useContext(store)
 	const history = useHistory()
@@ -21,7 +26,9 @@ const Home: React.FC = () => {
 		})
 		.sort((a, b) => a.match_number - b.match_number)
 
-	console.log('relevantMatches:', relevantMatches)
+	const scoutedMatches = Object.values(value.scoutedMatch.state.documents)
+
+	console.log('scoutedMatches:', scoutedMatches)
 
 	const [teamsToScout, setTeamsToScout] = useState<{[key: string]: string}>({})
 
@@ -30,7 +37,9 @@ const Home: React.FC = () => {
 			name: 'Match #',
 			key: 'match',
 			getValue: (row: MatchAPIResponse) => {
-				return `${row.comp_level}${row.match_number}`
+				const scoutedMatchesCompleted = getScoutedMatchesForMatch(scoutedMatches, row.key)
+
+				return `${row.comp_level}${row.match_number} (${scoutedMatchesCompleted.length}/6)`
 			},
 		},
 		{
@@ -51,6 +60,23 @@ const Home: React.FC = () => {
 				return (
 					<Select
 						options={teamsList}
+						styles={{
+							option: (provided, state) => {
+								const teamNum = state.value
+								const matchScoutKey = `${row.key}_${teamNum}`
+
+								if (value.scoutedMatch.state.documents[matchScoutKey]) {
+									return {
+										...provided,
+										backgroundColor: '#64ffda',
+									}
+								}
+
+								return {
+									...provided,
+								}
+							},
+						}}
 						onChange={(selectedVal) => {
 							setTeamsToScout({
 								...teamsToScout,
@@ -94,10 +120,6 @@ const Home: React.FC = () => {
 				data={relevantMatches}
 				options={{
 					globalFilter: (origRows, keysArr, c) => {
-					// console.log('origRows:', origRows)
-					// console.log('keysArr:', keysArr)
-					// console.log('c:', c)
-
 						return origRows.filter((origRow) => {
 							const actualObj = origRow.original
 
