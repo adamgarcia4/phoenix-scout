@@ -82,14 +82,43 @@ const Home: React.FC = () => {
 		},
 	]
 
-	const matches = value.matches.state.documents
-	console.log('matches:', matches)
+	// const matches = value.matches.state.documents
+	// console.log('matches:', matches)
 
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
 
-			<TableComponent headers={headers} data={relevantMatches} />
+			<TableComponent
+				headers={headers}
+				data={relevantMatches}
+				options={{
+					globalFilter: (origRows, keysArr, c) => {
+					// console.log('origRows:', origRows)
+					// console.log('keysArr:', keysArr)
+					// console.log('c:', c)
+
+						return origRows.filter((origRow) => {
+							const actualObj = origRow.original
+
+							if (actualObj.key.includes(c)) {
+								return true
+							}
+
+							if (actualObj.alliances) {
+								if (
+									actualObj.alliances.blue.team_keys.includes(c)
+								|| actualObj.alliances.red.team_keys.includes(c)
+								) {
+									return true
+								}
+							}
+
+							return false
+						})
+					},
+				}}
+			/>
 		</div>
 	)
 }

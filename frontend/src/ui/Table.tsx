@@ -40,18 +40,20 @@ export interface HeadersInterface {
 export interface DataInterface {
 	[key: string]: any,
 }
+
+interface ITableOptions {
+	globalFilter: (origRows: any[], headerKeys: string[], query: string) => any[]
+}
+
 interface TableProps {
 	headers: HeadersInterface[],
 	data?: DataInterface[] | undefined,
+	options?: ITableOptions
 }
 
 interface HeaderComponentProps {
 	headers: any[]
 	// headers: HeadersInterface[]
-}
-
-interface ILabelProps {
-	header: HeadersInterface
 }
 
 const HeaderComponent = ({ headers }) => {
@@ -70,7 +72,7 @@ const HeaderComponent = ({ headers }) => {
 							}}
 							>
 								<div>{column.render('Header')}</div>
-								{/* <TextField id="standard-search" label="Search" type="search" /> */}
+								{/* <TextField id="standard-search" type="search" /> */}
 							</div>
 						</TableCell>
 					)
@@ -81,6 +83,8 @@ const HeaderComponent = ({ headers }) => {
 }
 
 const DataComponent = ({ rows, prepareRow }) => {
+	console.log('rows:', rows)
+
 	return (
 		<TableBody>
 			{rows.map(
@@ -106,8 +110,12 @@ const DataComponent = ({ rows, prepareRow }) => {
 	)
 }
 
-const TableComponent = ({ headers, data }: TableProps) => {
+const TableComponent = ({ headers, data, options }: TableProps) => {
 	const classes = useStyles({})
+
+	const dataMemo = useMemo(() => {
+		return data
+	}, [data])
 
 	const columns = useMemo(() => {
 		const cols = headers.map((header) => {
@@ -119,6 +127,8 @@ const TableComponent = ({ headers, data }: TableProps) => {
 
 		return cols
 	}, [headers])
+
+	const globalFilterFunction = options?.globalFilter ? options.globalFilter : () => true
 
 	const {
 		/**
@@ -147,28 +157,14 @@ const TableComponent = ({ headers, data }: TableProps) => {
 		setGlobalFilter,
 	} = useTable({
 		columns,
-		data,
+		data: dataMemo,
 		initialState: {
-			globalFilter: '',
+			// globalFilter: '',
 		},
-		globalFilter: (origRows, keysArr, c) => {
-			return origRows.filter((origRow) => {
-				for (const key of keysArr) {
-					if (origRow.original[key] === c) {
-						return true
-					}
-				}
-				return false
-			})
-		},
+		globalFilter: globalFilterFunction,
 	},
 	useGlobalFilter,
 	usePagination)
-
-	// console.log('globalFilter:', globalFilter)
-	// console.log('headerGroups:', headerGroups)
-	// console.log('rows:', rows)
-	// console.log('page:', page)
 
 	useEffect(() => {
 		if (page.length === 0 && pageIndex !== 0) {

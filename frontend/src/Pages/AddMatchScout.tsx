@@ -311,15 +311,13 @@ export default function AddMatch() {
 	const matchDetails = context.matches.state.documents?.[matchKey]
 
 	const scoutMatchKey = `${matchKey}_${teamNum}`
-	console.log('scoutMatchKey:', scoutMatchKey)
+	// console.log('scoutMatchKey:', scoutMatchKey)
 
 	const scoutedMatch = context.scoutedMatch.state.documents?.[scoutMatchKey]
 
-	console.log('scoutedMatch:', scoutedMatch)
-
+	// console.log('scoutedMatch:', scoutedMatch)
 
 	// TODO: Reducer and initial state from scoutedMatch
-
 	const [
 		numHighSuccessAuto,
 		setNumHighSuccessAuto,
