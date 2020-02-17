@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  frontend:
+    image: 'adameitangarcia/phoenix-scout-frontend:v1'
+    command: yarn start
+    ports:
+      - '3000:3000'
+    volumes:
+      - './frontend/src:/workdir/frontend/src:delegated'
+      - './shared/src:/workdir/shared/src:delegated'
+    env_file:
+      - .env
+  backend:
+    image: 'adameitangarcia/phoenix-scout-backend:v1'
+    ports:
+      - '8080:8080'
+    volumes:
+      - './server/src:/workdir/server/src:delegated'
+      - './shared/src:/workdir/shared/src:delegated'
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    environment:
+      WAIT_HOSTS: mongo:27017
+  mongo:
+    image: 'mongo'
+    volumes:
+      - ./data-volume:/data/db
+    ports:
+      - '27017:27017'
+volumes:
+  data-volume:
