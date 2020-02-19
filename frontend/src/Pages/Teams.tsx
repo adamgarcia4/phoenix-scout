@@ -11,6 +11,8 @@ const Teams = () => {
 	const value = useContext(store)
 	const history = useHistory()
 
+	const rawRows = Object.values(value.teams.state.documents)
+	const sortedRows = rawRows.sort((a, b) => a.team_number - b.team_number)
 	const headers: HeadersInterface[] = [
 		{
 			name: '#',
@@ -42,7 +44,7 @@ const Teams = () => {
 		<div>
 			<Table
 				headers={headers}
-				data={Object.values(value.teams.state.documents)}
+				data={sortedRows}
 				options={{
 					globalFilter: (origRows, keysArr, c: string) => {
 						return origRows.filter((origRow) => {

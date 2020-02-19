@@ -58,7 +58,6 @@ interface HeaderComponentProps {
 }
 
 const HeaderComponent = ({ headers }) => {
-	// console.log('headers:', headers)
 	return (
 		<TableHead>
 			<TableRow>
@@ -84,8 +83,6 @@ const HeaderComponent = ({ headers }) => {
 }
 
 const DataComponent = ({ rows, prepareRow }) => {
-	console.log('rows:', rows)
-
 	return (
 		<TableBody>
 			{rows.map(
