@@ -199,7 +199,7 @@ const TableComponent = ({ headers, data, options }: TableProps) => {
 			<Paper style={{ padding: '10px' }}>
 				<SearchInput
 					options={options}
-					globalFilter={globalFilterFunction}
+					globalFilter={globalFilter}
 					setGlobalFilter={setGlobalFilter}
 				/>
 				<TableContainer style={{ minHeight: '400px' }}>
