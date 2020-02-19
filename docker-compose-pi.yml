@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   frontend:
-    image: 'adameitangarcia/phoenix-scout-frontend:v1'
+    image: 'adameitangarcia/phoenix-scout-frontend:pi'
     command: yarn start
     ports:
       - '3000:3000'
@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
   backend:
-    image: 'adameitangarcia/phoenix-scout-backend:v1'
+    image: 'adameitangarcia/phoenix-scout-backend:pi'
     ports:
       - '8080:8080'
     volumes:

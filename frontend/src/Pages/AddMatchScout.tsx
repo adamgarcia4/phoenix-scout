@@ -23,6 +23,8 @@ import {
 	ScoutedMatch,
 	MatchAPIResponse,
 } from '@shared/Interfaces'
+
+import { paths } from '../App'
 import Expansion from '../ui/Expansion'
 import { store } from '../store'
 
@@ -303,16 +305,11 @@ const Summary = ({
 export default function AddMatch() {
 	const context = useContext(store)
 
-	const params = useParams()
-
-	const { matchKey, teamNum } = params as any
-
+	const { matchKey, teamNum } = paths.addMatchPage.params(useParams())
 
 	const matchDetails = context.matches.state.documents?.[matchKey]
 
 	const scoutMatchKey = `${matchKey}_${teamNum}`
-	// console.log('scoutMatchKey:', scoutMatchKey)
-
 	const scoutedMatch = context.scoutedMatch.state.documents?.[scoutMatchKey]
 
 	// console.log('scoutedMatch:', scoutedMatch)

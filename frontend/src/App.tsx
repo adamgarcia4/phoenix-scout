@@ -22,6 +22,12 @@ export const paths = {
 		get: (matchKey, teamNum) => {
 			return `match/${matchKey}/scout/${teamNum}`
 		},
+		params: (params) => {
+			return {
+				matchKey: params.matchKey,
+				teamNum: params.teamNum,
+			}
+		}
 	},
 	teamsPage: '/teams',
 	teamDetailsPage: {
