@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
+import Button from '@material-ui/core/Button'
+import { ScoutedMatch } from '@shared/Interfaces'
 import { TeamInterface } from '../Interfaces'
 import Table, { HeadersInterface } from '../ui/Table'
 import { store } from '../store'
-import Button from '@material-ui/core/Button'
 import { paths } from '../App'
-import { ScoutedMatch } from '@shared/Interfaces'
 
 const Teams = () => {
 	const value = useContext(store)
@@ -21,7 +21,7 @@ const Teams = () => {
 			key: 'nickname',
 		},
 		{
-			name: 'See Details',
+			name: 'Team Details',
 			key: 'detail',
 			getValue: (row: ScoutedMatch) => {
 				return (
@@ -32,7 +32,7 @@ const Teams = () => {
 							history.push(paths.teamDetailsPage.get(row.key))
 						}}
 					>
-						Scout Now
+						See Team Details
 					</Button>
 				)
 			},
@@ -40,7 +40,23 @@ const Teams = () => {
 	]
 	return (
 		<div>
-			<Table headers={headers} data={Object.values(value.teams.state.documents)} />
+			<Table
+				headers={headers}
+				data={Object.values(value.teams.state.documents)}
+				options={{
+					globalFilter: (origRows, keysArr, c: string) => {
+						return origRows.filter((origRow) => {
+							const actualObj: TeamInterface = origRow.original
+
+							if (actualObj.team_number.toString().includes(c)) {
+								return true
+							}
+
+							return false
+						})
+					},
+				}}
+			/>
 		</div>
 	)
 }

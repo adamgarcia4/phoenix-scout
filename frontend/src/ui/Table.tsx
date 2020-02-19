@@ -42,6 +42,7 @@ export interface DataInterface {
 }
 
 interface ITableOptions {
+	// TODO: Provide default so this doesn't break
 	globalFilter: (origRows: any[], headerKeys: string[], query: string) => any[]
 }
 
@@ -110,6 +111,27 @@ const DataComponent = ({ rows, prepareRow }) => {
 	)
 }
 
+const SearchInput = ({ options, setGlobalFilter, globalFilter }) => {
+	if (!options || !options.globalFilter) {
+		return null
+	}
+
+	return (
+		<TextField
+			label="Search"
+			helperText="Search by team. Eg: frc4"
+			variant="outlined"
+			onChange={(event) => {
+				if (!event.target.value) {
+					setGlobalFilter(undefined)
+				} else {
+					setGlobalFilter(event.target.value)
+				}
+			}}
+			value={globalFilter || ''}
+		/>
+	)
+}
 const TableComponent = ({ headers, data, options }: TableProps) => {
 	const classes = useStyles({})
 
@@ -175,18 +197,10 @@ const TableComponent = ({ headers, data, options }: TableProps) => {
 	return (
 		<>
 			<Paper style={{ padding: '10px' }}>
-				<TextField
-					label="Search"
-					helperText="Search by team. Eg: frc4"
-					variant="outlined"
-					onChange={(event) => {
-						if (!event.target.value) {
-							setGlobalFilter(undefined)
-						} else {
-							setGlobalFilter(event.target.value)
-						}
-					}}
-					value={globalFilter || ''}
+				<SearchInput
+					options={options}
+					globalFilter={globalFilterFunction}
+					setGlobalFilter={setGlobalFilter}
 				/>
 				<TableContainer style={{ minHeight: '400px' }}>
 					<Table className={classes.table} aria-label="simple table">

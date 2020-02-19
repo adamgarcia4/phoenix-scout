@@ -204,7 +204,7 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 						<ListItemIcon>
 							<HomeIcon />
 						</ListItemIcon>
-						<ListItemText primary="Home" />
+						<ListItemText primary="Match Scout" />
 					</ListItem>
 					{/* <ListItem selected={isPath(paths.schedulePage)}
 					button onClick={() => navigateToPath(paths.schedulePage)}>
@@ -222,16 +222,6 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 							<RedditIcon />
 						</ListItemIcon>
 						<ListItemText primary="See Teams" />
-					</ListItem>
-					<ListItem
-						selected={isPath(paths.addMatchPage.route)}
-						button
-						onClick={() => navigateToPath(paths.addMatchPage.route)}
-					>
-						<ListItemIcon>
-							<NoteAddIcon />
-						</ListItemIcon>
-						<ListItemText primary="Add Match" />
 					</ListItem>
 					<Divider />
 					<ListItem
