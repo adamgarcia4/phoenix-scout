@@ -17,6 +17,17 @@ import { StateProvider } from './store'
 
 export const paths = {
 	aboutPage: '/about',
+	matchOverview: {
+		route: '/match/:matchKey',
+		get: (matchKey) => {
+			return `match/${matchKey}`
+		},
+		params: (params) => {
+			return {
+				matchKey: params.matchKey,
+			}
+		},
+	},
 	addMatchPage: {
 		route: '/match/:matchKey/scout/:teamNum',
 		get: (matchKey, teamNum) => {
@@ -27,7 +38,7 @@ export const paths = {
 				matchKey: params.matchKey,
 				teamNum: params.teamNum,
 			}
-		}
+		},
 	},
 	teamsPage: '/teams',
 	teamDetailsPage: {
@@ -49,6 +60,9 @@ const App: React.FC = () => (
 					</Route>
 					<Route path={paths.addMatchPage.route}>
 						<AddMatch />
+					</Route>
+					<Route path={paths.matchOverview.route}>
+						hiii
 					</Route>
 					<Route path={paths.teamsPage}>
 						<TeamsPage />

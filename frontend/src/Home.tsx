@@ -28,8 +28,6 @@ const Home: React.FC = () => {
 
 	const scoutedMatches = Object.values(value.scoutedMatch.state.documents)
 
-	console.log('scoutedMatches:', scoutedMatches)
-
 	const [teamsToScout, setTeamsToScout] = useState<{[key: string]: string}>({})
 
 	const headers: HeadersInterface[] = [
@@ -91,17 +89,33 @@ const Home: React.FC = () => {
 			name: 'Actions',
 			key: 'action',
 			getValue: (row: MatchAPIResponse) => {
+				const buttonsArr = []
+
 				return (
-					<Button
-						variant="contained"
-						color="primary"
-						disabled={!teamsToScout[row.key]}
-						onClick={() => {
-							history.push(paths.addMatchPage.get(row.key, teamsToScout[row.key]))
-						}}
-					>
-						Scout Now
-					</Button>
+					<div>
+						<Button
+							variant="contained"
+							color="primary"
+							disabled={!teamsToScout[row.key]}
+							onClick={() => {
+								history.push(paths.addMatchPage.get(row.key, teamsToScout[row.key]))
+							}}
+							style={{ marginRight: '5px' }}
+						>
+							Scout Now
+						</Button>
+
+						<Button
+							variant="contained"
+							color="primary"
+							onClick={() => {
+								history.push(paths.matchOverview.get(row.key))
+							}}
+						>
+							Overview
+						</Button>
+
+					</div>
 				)
 			},
 			sort: false,
