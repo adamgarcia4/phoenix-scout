@@ -2,6 +2,26 @@ export type User = {
   name: string,
 }
 
+export type ScoutedMatchData = {
+  auto: {
+    numHighSuccess: number,
+    numHighFailed: number,
+    numLowSuccess: number,
+    numLowFailed: number,
+    didMove: boolean,
+  },
+  // tele: {
+    //   numHighSuccess: number,
+    //   numHighFailed: number,
+    //   numLowSuccess: number,
+    //   numLowFailed: number,
+    //   fitUnderTrench: boolean,
+    //   didRotateColorWheel: boolean,
+    //   didAttemptClimb: boolean,
+    //   didClimbSuccess: boolean,
+    // }
+}
+
 export type ScoutedMatch = {
   /**
    * Mongo ID
@@ -38,25 +58,7 @@ export type ScoutedMatch = {
   /**
    * This is the actual scouted data
    */
-  data?: {
-    auto: {
-      numHighSuccess: number,
-      numHighFailed: number,
-      numLowSuccess: number,
-      numLowFailed: number,
-      didMove: boolean,
-    },
-    // tele: {
-    //   numHighSuccess: number,
-    //   numHighFailed: number,
-    //   numLowSuccess: number,
-    //   numLowFailed: number,
-    //   fitUnderTrench: boolean,
-    //   didRotateColorWheel: boolean,
-    //   didAttemptClimb: boolean,
-    //   didClimbSuccess: boolean,
-    // }
-  },
+  data?: ScoutedMatchData,
   // fromAPI?: boolean,
   /**
    * The profile of the scout assigned

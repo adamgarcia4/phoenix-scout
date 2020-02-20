@@ -1,5 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { useState, useContext, useEffect } from 'react'
+import React, {
+	useState, useContext, useEffect, useReducer,
+} from 'react'
 import {
 	Button,
 	Typography,
@@ -21,6 +23,7 @@ import {
 
 import {
 	ScoutedMatch,
+	ScoutedMatchData,
 	MatchAPIResponse,
 } from '@shared/Interfaces'
 
@@ -302,6 +305,32 @@ const Summary = ({
 		</>
 	)
 }
+
+type MatchActions = {
+	type: 'initializeData',
+	data: ScoutedMatchData
+} | {
+	type: 'setAuto',
+	key: string,
+	value: any,
+}
+
+const matchReducer = (prevState: ScoutedMatchData, action: MatchActions) => {
+	switch (action.type) {
+	case 'initializeData':
+		return action.data
+	case 'setAuto':
+		return {
+			auto: {
+				...prevState.auto,
+				[action.key]: action.value,
+			},
+		}
+	default:
+		return prevState
+	}
+}
+
 export default function AddMatch() {
 	const context = useContext(store)
 
@@ -312,18 +341,18 @@ export default function AddMatch() {
 	const scoutMatchKey = `${matchKey}_${teamNum}`
 	const scoutedMatch = context.scoutedMatch.state.documents?.[scoutMatchKey]
 
-	// console.log('scoutedMatch:', scoutedMatch)
+	const getInitialState: () => ScoutedMatchData = () => ({
+		auto: {
+			numHighSuccess: 0,
+			numHighFailed: 0,
+			numLowSuccess: 0,
+			numLowFailed: 0,
+			didMove: false,
+		},
+	})
 
-	// TODO: Reducer and initial state from scoutedMatch
-	const [
-		numHighSuccessAuto,
-		setNumHighSuccessAuto,
-	] = useState(scoutedMatch?.data?.auto.numHighSuccess ?? 0)
-
-	const [numHighFailedAuto, setNumHighFailedAuto] = useState(0)
-	const [numLowSuccessAuto, setNumLowSuccessAuto] = useState(0)
-	const [numLowFailedAuto, setNumLowFailedAuto] = useState(0)
-	const [didMove, setDidMove] = useState(false)
+	const [data, dispatch] = useReducer(matchReducer, getInitialState())
+	const [oldData, setOldData] = useState(undefined)
 
 	const [numHighTele, setNumHighTele] = useState(0)
 	const [numLowTele, setNumLowTele] = useState(0)
@@ -333,63 +362,19 @@ export default function AddMatch() {
 	// update all state when data comes live
 	useEffect(() => {
 		if (scoutedMatch?.data) {
-			setNumHighSuccessAuto(scoutedMatch.data?.auto.numHighSuccess)
-			setNumHighFailedAuto(scoutedMatch.data?.auto.numHighFailed)
-			setNumLowSuccessAuto(scoutedMatch.data?.auto.numLowSuccess)
-			setNumLowFailedAuto(scoutedMatch.data?.auto.numLowFailed)
+			setOldData(scoutedMatch.data)
 
-			setDidMove(scoutedMatch.data?.auto.didMove)
+			dispatch({
+				type: 'initializeData',
+				data: scoutedMatch.data,
+			})
 		}
 	}, [scoutedMatch])
+
 	const history = useHistory()
 
 	const [expanded, setExpanded] = useState<string | false>('panel1')
 	const classes = useStyles({})
-
-	const submitMatch = () => {
-		// const newMatchObj = JSON.parse(JSON.stringify(scoutedMatch))
-		const newMatchObj: ScoutedMatch = {
-			key: `${matchDetails.key}_${teamNum}`,
-			match: matchKey,
-			team: teamNum,
-			compLevel: matchDetails.comp_level,
-			side: getSide(matchDetails, teamNum),
-			data: {
-				auto: {
-					numHighSuccess: numHighSuccessAuto,
-					numHighFailed: numHighFailedAuto,
-					numLowSuccess: numLowSuccessAuto,
-					numLowFailed: numLowFailedAuto,
-					didMove,
-				},
-			},
-			// tele: {
-			// numHighSuccess,
-			// numHighFailed,
-			// numLowSuccess,
-			// numLowFailed,
-			// fitUnderTrench,
-			// didRotateColorWheel,
-			// didAttemptClimb,
-			// didClimbSuccess,
-			// },
-		}
-
-		context.scoutedMatch.dispatch({
-			type: 'addData',
-			data: newMatchObj,
-		})
-
-		history.push('/')
-	}
-
-	const isDirty = () => !(
-		numHighSuccessAuto
-		|| numHighFailedAuto
-		|| numLowSuccessAuto
-		|| numLowFailedAuto
-		|| didMove
-	)
 
 	const handlePanelChange = (panel: string) => (
 		event: React.ChangeEvent<{}>,
@@ -399,6 +384,33 @@ export default function AddMatch() {
 	}
 
 	const styles = useStyles({})
+
+	const submitMatch = () => {
+		const newMatchObj: ScoutedMatch = {
+			key: `${matchDetails.key}_${teamNum}`,
+			match: matchKey,
+			team: teamNum,
+			compLevel: matchDetails.comp_level,
+			side: getSide(matchDetails, teamNum),
+			data,
+		}
+
+		console.log('newMatchObj:', newMatchObj)
+		context.scoutedMatch.dispatch({
+			type: 'addData',
+			data: newMatchObj,
+		})
+
+		history.push('/')
+	}
+
+	const updateAutoVal = (key) => (val) => {
+		dispatch({
+			type: 'setAuto',
+			key,
+			value: val,
+		})
+	}
 
 	return (
 		<div className={classes.root}>
@@ -414,16 +426,16 @@ export default function AddMatch() {
 						title: 'Auton Mode',
 						content: (
 							<AutonMode
-								numHighSuccess={numHighSuccessAuto}
-								setNumHighSuccess={setNumHighSuccessAuto}
-								numHighFailed={numHighFailedAuto}
-								setNumHighFailed={setNumHighFailedAuto}
-								numLowSuccess={numLowSuccessAuto}
-								setNumLowSuccess={setNumLowSuccessAuto}
-								numLowFailed={numLowFailedAuto}
-								setNumLowFailed={setNumLowFailedAuto}
-								didMove={didMove}
-								setDidMove={setDidMove}
+								numHighSuccess={data.auto.numHighSuccess}
+								setNumHighSuccess={updateAutoVal('numHighSuccess')}
+								numHighFailed={data.auto.numHighFailed}
+								setNumHighFailed={updateAutoVal('numHighFailed')}
+								numLowSuccess={data.auto.numLowSuccess}
+								setNumLowSuccess={updateAutoVal('numLowSuccess')}
+								numLowFailed={data.auto.numLowFailed}
+								setNumLowFailed={updateAutoVal('numLowFailed')}
+								didMove={data.auto.didMove}
+								setDidMove={updateAutoVal('didMove')}
 							/>
 						),
 					},
@@ -454,7 +466,12 @@ export default function AddMatch() {
 				]}
 			/>
 
-			<Fab color="primary" className={classes.saveFab} disabled={isDirty()} onClick={() => submitMatch()}>
+			<Fab
+				color="primary"
+				className={classes.saveFab}
+				disabled={JSON.stringify(oldData) === JSON.stringify(data)}
+				onClick={() => submitMatch()}
+			>
 				<SaveIcon />
 			</Fab>
 		</div>
