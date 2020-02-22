@@ -7,16 +7,38 @@ import { useHistory } from 'react-router-dom'
 
 import { MatchAPIResponse, ScoutedMatch } from '@shared/Interfaces'
 import Select from 'react-select'
-import TableComponent, { HeadersInterface } from './ui/Table'
-import { store } from './store'
-import { paths } from './App'
+import TableComponent, { HeadersInterface } from '../ui/Table'
+import { store } from '../store'
+import { paths } from '../App'
 
 const getScoutedMatchesForMatch = (allScoutedMatches: ScoutedMatch[], matchKey: string) => {
 	return allScoutedMatches.filter((scoutedMatch) => {
 		return scoutedMatch.match === matchKey
 	})
 }
-const Home: React.FC = () => {
+
+const globalFilter = (origRows, keysArr, c) => {
+	return origRows.filter((origRow) => {
+		const actualObj = origRow.original
+
+		if (actualObj.key.includes(c)) {
+			return true
+		}
+
+		if (actualObj.alliances) {
+			if (
+				actualObj.alliances.blue.team_keys.includes(c)
+			|| actualObj.alliances.red.team_keys.includes(c)
+			) {
+				return true
+			}
+		}
+
+		return false
+	})
+}
+
+const MatchScout: React.FC = () => {
 	const value = useContext(store)
 	const history = useHistory()
 
@@ -81,16 +103,21 @@ const Home: React.FC = () => {
 								[row.key]: selectedVal.value,
 							})
 						}}
+						defaultValue={teamsToScout[row.key] ? {
+							value: teamsToScout[row.key],
+							label: teamsToScout[row.key],
+						} : null}
 					/>
 				)
+			},
+			styles: {
+				minWidth: '200px',
 			},
 		},
 		{
 			name: 'Actions',
 			key: 'action',
 			getValue: (row: MatchAPIResponse) => {
-				const buttonsArr = []
-
 				return (
 					<div>
 						<Button
@@ -122,41 +149,17 @@ const Home: React.FC = () => {
 		},
 	]
 
-	// const matches = value.matches.state.documents
-	// console.log('matches:', matches)
-
 	return (
 		<div>
 			<h1>Welcome to Phoenix Scout Home!</h1>
 
 			<TableComponent
-				headers={headers}
-				data={relevantMatches}
-				options={{
-					globalFilter: (origRows, keysArr, c) => {
-						return origRows.filter((origRow) => {
-							const actualObj = origRow.original
-
-							if (actualObj.key.includes(c)) {
-								return true
-							}
-
-							if (actualObj.alliances) {
-								if (
-									actualObj.alliances.blue.team_keys.includes(c)
-								|| actualObj.alliances.red.team_keys.includes(c)
-								) {
-									return true
-								}
-							}
-
-							return false
-						})
-					},
-				}}
+				headers={React.useMemo(() => headers, [headers])}
+				data={React.useMemo(() => relevantMatches, [value.matches.state.documents])}
+				options={{ globalFilter }}
 			/>
 		</div>
 	)
 }
 
-export default Home
+export default MatchScout

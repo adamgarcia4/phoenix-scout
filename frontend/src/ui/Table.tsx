@@ -24,17 +24,27 @@ import {
 
 const useStyles = makeStyles({
 	table: {
-		minWidth: 650,
+		// minWidth: 650,
 	},
 })
 
 export interface HeadersInterface {
+	/**
+	 * Name of column
+	 */
 	name: string,
+	/**
+	 * Unique identifier for row
+	 */
 	key: string,
 	align?: 'right',
 	getValue?: Function | undefined,
-	render?: Function,
+	// render?: Function,
+	/**
+	 * Should column be sortable?  Defaults to true
+	 */
 	sort?: boolean,
+	styles?: React.CSSProperties
 }
 
 export interface DataInterface {
@@ -43,7 +53,11 @@ export interface DataInterface {
 
 interface ITableOptions {
 	// TODO: Provide default so this doesn't break
-	globalFilter: (origRows: any[], headerKeys: string[], query: string) => any[]
+	globalFilter: (origRows: any[], headerKeys: string[], query: string) => any[],
+	/**
+	 * Defaults to true.
+	 */
+	shouldPaginate?: boolean
 }
 
 interface TableProps {
@@ -66,11 +80,7 @@ const HeaderComponent = ({ headers }) => {
 						<TableCell
 							key={column.id}
 						>
-							<div style={{
-								// display: 'flex',
-								// flexDirection: 'column',
-							}}
-							>
+							<div style={column.styles || {}}>
 								<div>{column.render('Header')}</div>
 								{/* <TextField id="standard-search" type="search" /> */}
 							</div>
@@ -116,7 +126,7 @@ const SearchInput = ({ options, setGlobalFilter, globalFilter }) => {
 	return (
 		<TextField
 			label="Search"
-			helperText="Search by team. Eg: frc4"
+			// helperText="Search by team. Eg: frc4"
 			variant="outlined"
 			onChange={(event) => {
 				if (!event.target.value) {
@@ -132,23 +142,16 @@ const SearchInput = ({ options, setGlobalFilter, globalFilter }) => {
 const TableComponent = ({ headers, data, options }: TableProps) => {
 	const classes = useStyles({})
 
-	const dataMemo = useMemo(() => {
-		return data
-	}, [data])
-
-	const columns = useMemo(() => {
-		const cols = headers.map((header) => {
-			return {
-				Header: header.name,
-				accessor: header.getValue ?? header.key,
-			}
-		})
-
-		return cols
-	}, [headers])
-
+	const cols = (headers || []).map((header) => {
+		return {
+			Header: header.name,
+			accessor: header.getValue ?? header.key,
+			styles: header.styles || undefined,
+		}
+	})
 	const globalFilterFunction = options?.globalFilter ? options.globalFilter : () => true
 
+	const memoGlobalFilterFunction = React.useMemo(() => globalFilterFunction, [])
 	const {
 		/**
 		 * Base Table Render Methods
@@ -175,12 +178,9 @@ const TableComponent = ({ headers, data, options }: TableProps) => {
 		},
 		setGlobalFilter,
 	} = useTable({
-		columns,
-		data: dataMemo,
-		initialState: {
-			// globalFilter: '',
-		},
-		globalFilter: globalFilterFunction,
+		columns: cols,
+		data,
+		globalFilter: memoGlobalFilterFunction,
 	},
 	useGlobalFilter,
 	usePagination)

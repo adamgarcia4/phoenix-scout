@@ -27,7 +27,7 @@ const DataLoader = () => {
 				})
 			}}
 		>
-			Sync Data
+			Sync
 		</Button>
 	)
 }

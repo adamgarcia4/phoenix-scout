@@ -7,12 +7,13 @@ import {
 } from 'react-router-dom'
 
 import About from './About'
-import Home from './Home'
+import MatchScout from './Pages/MatchScout'
 import AddMatch from './Pages/AddMatchScout'
 import Admin from './Pages/Admin'
 import Header from './components/Header'
 import TeamDetail from './Pages/TeamDetail'
 import TeamsPage from './Pages/Teams'
+import MatchOverview from './Pages/MatchOverview'
 import { StateProvider } from './store'
 
 export const paths = {
@@ -62,7 +63,7 @@ const App: React.FC = () => (
 						<AddMatch />
 					</Route>
 					<Route path={paths.matchOverview.route}>
-						hiii
+						<MatchOverview />
 					</Route>
 					<Route path={paths.teamsPage}>
 						<TeamsPage />
@@ -74,7 +75,7 @@ const App: React.FC = () => (
 						<Admin />
 					</Route>
 					<Route path={paths.homePage}>
-						<Home />
+						<MatchScout />
 					</Route>
 				</Switch>
 			</Header>
