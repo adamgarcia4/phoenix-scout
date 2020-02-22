@@ -12,7 +12,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles'
 import styled from 'styled-components'
 import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
-import FormGroup from '@material-ui/core/FormGroup'
+// import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Paper from '@material-ui/core/Paper'
 import Switch from '@material-ui/core/Switch'
@@ -96,6 +96,32 @@ const BallCountSection = ({
 	</>
 )
 
+interface IToggleProps {
+	value: boolean,
+	setValue: Function,
+	label: string,
+}
+
+const Toggle = ({ value, setValue, label }: IToggleProps) => {
+	return (
+		<FormControlLabel
+			control={(
+				<Switch
+					checked={value}
+					// TODO: Fix to type safety
+					onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+						setValue(checked)
+						return true
+					}}
+					// value="checkedB"
+					color="primary"
+				/>
+			)}
+			label={label}
+		/>
+	)
+}
+
 interface AutonModeProps {
 	numHighSuccess: number;
 	setNumHighSuccess: Function;
@@ -123,20 +149,10 @@ const AutonMode = ({
 }: AutonModeProps) => {
 	return (
 		<Box display="flex" flexDirection="column">
-			<FormControlLabel
-				control={(
-					<Switch
-						checked={didMove}
-						// TODO: Fix to type safety
-						onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-							setDidMove(checked)
-							return true
-						}}
-						value="checkedB"
-						color="primary"
-					/>
-				)}
+			<Toggle
 				label="Did Robot Move?"
+				value={didMove}
+				setValue={setDidMove}
 			/>
 			<Box>
 				<BallCountSection
@@ -171,88 +187,110 @@ const AutonMode = ({
 }
 
 interface TeleModeProps {
-  numHigh: number,
-  setNumHigh: Function,
-  numLow: number,
-  setNumLow: Function,
-  isColorWheel: boolean,
-  setIsColorWheel: Function,
+	numHighSuccess: number;
+	setNumHighSuccess: Function;
+	numHighFailed: number;
+	setNumHighFailed: Function;
+	numLowSuccess: number;
+	setNumLowSuccess: Function;
+	numLowFailed: number;
+	setNumLowFailed: Function;
+
+	fitUnderTrench: boolean;
+	setFitUnderTrench: Function;
+
+  stage2Color: boolean,
+	setStage2Color: Function,
+
+	stage3Color: boolean,
+	setStage3Color: Function,
+
+	attemptedClimb: boolean,
+	setAttemptedClimb: Function,
+
+	climbSuccess: boolean,
+	setClimbSuccess: Function,
 }
 
 const TeleMode = ({
-	numHigh,
-	setNumHigh,
-	numLow,
-	setNumLow,
-	isColorWheel,
-	setIsColorWheel,
+	numHighSuccess,
+	setNumHighSuccess,
+	numHighFailed,
+	setNumHighFailed,
+	numLowSuccess,
+	setNumLowSuccess,
+	numLowFailed,
+	setNumLowFailed,
+
+	fitUnderTrench,
+	setFitUnderTrench,
+
+	stage2Color,
+	setStage2Color,
+	stage3Color,
+	setStage3Color,
+
+	attemptedClimb,
+	setAttemptedClimb,
+
+	climbSuccess,
+	setClimbSuccess,
 }: TeleModeProps) => {
 	return (
 		<Box display="flex" flexDirection="column">
-			<Typography>
-                Please record results of Teleop Here!
-			</Typography>
 			<Box>
 				<BallCountSection
-					title="High Balls"
-					numBalls={numHigh}
-					incrementFunction={setNumHigh}
+					title="High Balls Scored"
+					numBalls={numHighSuccess}
+					incrementFunction={setNumHighSuccess}
 				/>
 			</Box>
 			<Box>
 				<BallCountSection
-					title="Low Balls"
-					numBalls={numLow}
-					incrementFunction={setNumLow}
+					title="High Balls Missed"
+					numBalls={numHighFailed}
+					incrementFunction={setNumHighFailed}
 				/>
 			</Box>
-
 			<Box>
-				<FormGroup row>
-					<FormControlLabel
-						control={
-							<Switch checked={isColorWheel} onChange={() => setIsColorWheel(!isColorWheel)} value="checkedA" />
-						}
-						label="Color Wheel Engaged"
-					/>
-				</FormGroup>
+				<BallCountSection
+					title="Low Balls Scored"
+					numBalls={numLowSuccess}
+					incrementFunction={setNumLowSuccess}
+				/>
 			</Box>
-
-
-		</Box>
-
-	)
-}
-
-interface EndGameModeProps {
-  expanded: any,
-  handlePanelChange: any,
-  didClimb: boolean,
-  setDidClimb: Function,
-}
-
-const EndGameMode = ({
-	didClimb,
-	setDidClimb,
-}: EndGameModeProps) => {
-	// const classes = useStyles({})
-	return (
-		<Box display="flex" flexDirection="column">
-			<Typography>
-                Please record results of the End Game!
-			</Typography>
 			<Box>
-				<FormGroup row>
-					<FormControlLabel
-						control={
-							<Switch checked={didClimb} onChange={() => setDidClimb(!didClimb)} value="checkedA" />
-						}
-						label="Did they climb"
-					/>
-				</FormGroup>
+				<BallCountSection
+					title="Low Balls Missed"
+					numBalls={numLowFailed}
+					incrementFunction={setNumLowFailed}
+				/>
 			</Box>
-
-
+			<Toggle
+				label="Did Fit Under Trench?"
+				value={fitUnderTrench}
+				setValue={setFitUnderTrench}
+			/>
+			<Toggle
+				label="Did Stage 2 Color Wheel"
+				value={stage2Color}
+				setValue={setStage2Color}
+			/>
+			<Toggle
+				label="Did Stage 3 Color Wheel"
+				value={stage3Color}
+				setValue={setStage3Color}
+			/>
+			<Toggle
+				label="Attempted Climb"
+				value={attemptedClimb}
+				setValue={setAttemptedClimb}
+			/>
+			<Toggle
+				label="Climb Successful"
+				value={climbSuccess}
+				setValue={setClimbSuccess}
+			/>
 		</Box>
 	)
 }
@@ -313,6 +351,10 @@ type MatchActions = {
 	type: 'setAuto',
 	key: string,
 	value: any,
+} | {
+	type: 'setTele',
+	key: string,
+	value: any,
 }
 
 const matchReducer = (prevState: ScoutedMatchData, action: MatchActions) => {
@@ -321,8 +363,17 @@ const matchReducer = (prevState: ScoutedMatchData, action: MatchActions) => {
 		return action.data
 	case 'setAuto':
 		return {
+			...prevState,
 			auto: {
 				...prevState.auto,
+				[action.key]: action.value,
+			},
+		}
+	case 'setTele':
+		return {
+			...prevState,
+			tele: {
+				...prevState.tele,
 				[action.key]: action.value,
 			},
 		}
@@ -349,17 +400,23 @@ export default function AddMatch() {
 			numLowFailed: 0,
 			didMove: false,
 		},
+		tele: {
+			numHighSuccess: 0,
+			numHighFailed: 0,
+			numLowSuccess: 0,
+			numLowFailed: 0,
+			fitUnderTrench: false,
+			stage2Color: false,
+			stage3Color: false,
+			attemptedClimb: false,
+			climbSuccess: false,
+		},
 	})
 
 	const [data, dispatch] = useReducer(matchReducer, getInitialState())
+
 	const [oldData, setOldData] = useState(undefined)
 
-	const [numHighTele, setNumHighTele] = useState(0)
-	const [numLowTele, setNumLowTele] = useState(0)
-	const [isColorWheel, setIsColorWheel] = useState(false)
-	const [didClimb, setDidClimb] = useState(false)
-
-	// update all state when data comes live
 	useEffect(() => {
 		if (scoutedMatch?.data) {
 			setOldData(scoutedMatch.data)
@@ -373,15 +430,7 @@ export default function AddMatch() {
 
 	const history = useHistory()
 
-	const [expanded, setExpanded] = useState<string | false>('panel1')
 	const classes = useStyles({})
-
-	const handlePanelChange = (panel: string) => (
-		event: React.ChangeEvent<{}>,
-		isExpanded: boolean,
-	) => {
-		setExpanded(isExpanded ? panel : false)
-	}
 
 	const styles = useStyles({})
 
@@ -395,7 +444,6 @@ export default function AddMatch() {
 			data,
 		}
 
-		console.log('newMatchObj:', newMatchObj)
 		context.scoutedMatch.dispatch({
 			type: 'addData',
 			data: newMatchObj,
@@ -407,6 +455,14 @@ export default function AddMatch() {
 	const updateAutoVal = (key) => (val) => {
 		dispatch({
 			type: 'setAuto',
+			key,
+			value: val,
+		})
+	}
+
+	const updateTeleVal = (key) => (val) => {
+		dispatch({
+			type: 'setTele',
 			key,
 			value: val,
 		})
@@ -443,23 +499,27 @@ export default function AddMatch() {
 						title: 'Tele Mode',
 						content: (
 							<TeleMode
-								numHigh={numHighTele}
-								setNumHigh={setNumHighTele}
-								numLow={numLowTele}
-								setNumLow={setNumLowTele}
-								isColorWheel={isColorWheel}
-								setIsColorWheel={setIsColorWheel}
-							/>
-						),
-					},
-					{
-						title: 'End Game',
-						content: (
-							<EndGameMode
-								expanded={expanded}
-								handlePanelChange={handlePanelChange}
-								didClimb={didClimb}
-								setDidClimb={setDidClimb}
+								numHighSuccess={data.tele.numHighSuccess}
+								setNumHighSuccess={updateTeleVal('numHighSuccess')}
+								numHighFailed={data.tele.numHighFailed}
+								setNumHighFailed={updateTeleVal('numHighFailed')}
+								numLowSuccess={data.tele.numLowSuccess}
+								setNumLowSuccess={updateTeleVal('numLowSuccess')}
+								numLowFailed={data.tele.numLowFailed}
+								setNumLowFailed={updateTeleVal('numLowFailed')}
+
+								fitUnderTrench={data.tele.fitUnderTrench}
+								setFitUnderTrench={updateTeleVal('fitUnderTrench')}
+
+								stage2Color={data.tele.stage2Color}
+								setStage2Color={updateTeleVal('stage2Color')}
+								stage3Color={data.tele.stage3Color}
+								setStage3Color={updateTeleVal('stage3Color')}
+
+								attemptedClimb={data.tele.attemptedClimb}
+								setAttemptedClimb={updateTeleVal('attemptedClimb')}
+								climbSuccess={data.tele.climbSuccess}
+								setClimbSuccess={updateTeleVal('climbSuccess')}
 							/>
 						),
 					},

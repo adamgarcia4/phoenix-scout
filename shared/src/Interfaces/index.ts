@@ -10,16 +10,17 @@ export type ScoutedMatchData = {
     numLowFailed: number,
     didMove: boolean,
   },
-  // tele: {
-    //   numHighSuccess: number,
-    //   numHighFailed: number,
-    //   numLowSuccess: number,
-    //   numLowFailed: number,
-    //   fitUnderTrench: boolean,
-    //   didRotateColorWheel: boolean,
-    //   didAttemptClimb: boolean,
-    //   didClimbSuccess: boolean,
-    // }
+  tele: {
+      numHighSuccess: number,
+      numHighFailed: number,
+      numLowSuccess: number,
+      numLowFailed: number,
+      fitUnderTrench: boolean,
+      stage2Color: boolean,
+      stage3Color: boolean,
+      attemptedClimb: boolean,
+      climbSuccess: boolean,
+    }
 }
 
 export type ScoutedMatch = {
