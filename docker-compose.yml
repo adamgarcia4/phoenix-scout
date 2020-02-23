@@ -29,8 +29,6 @@ services:
       - .env
     depends_on:
       - mongo
-    environment:
-      WAIT_HOSTS: mongo:27017
   mongo:
     image: 'mongo'
     volumes:

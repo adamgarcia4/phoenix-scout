@@ -15,9 +15,10 @@ FROM prereq as development
 
 RUN npm install --quiet --unsafe-perm --no-progress --no-audit --only=development
 
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
-RUN chmod +x /wait
+# ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
+# RUN chmod +x /wait
 ## All files will be volume mounted into the container
 EXPOSE 8080
 
-CMD /wait && npm run debug
+CMD npm run debug
+# CMD /wait && npm run debug

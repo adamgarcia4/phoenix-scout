@@ -7,8 +7,6 @@ dotenv.config({
 	path: path.resolve(__dirname, '../../../../.env')
 })
 
-
-
 const startServer = () => {
 	/**
 	 * Start Express server.
