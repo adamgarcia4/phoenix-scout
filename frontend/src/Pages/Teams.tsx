@@ -26,17 +26,36 @@ const Teams = () => {
 			name: 'Team Details',
 			key: 'detail',
 			getValue: (row: ScoutedMatch) => {
-				return (
+				const buttonsArr = []
+
+				buttonsArr.push((
 					<Button
 						variant="contained"
 						color="primary"
 						onClick={() => {
 							history.push(paths.teamDetailsPage.get(row.key))
 						}}
+						key="Team Details"
+						style={{ marginRight: '5px' }}
 					>
-						See Team Details
+					See Team Details
 					</Button>
-				)
+				))
+
+				buttonsArr.push((
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={() => {
+							history.push(paths.pitScout.get(row.key))
+						}}
+						key="Pit Scout"
+					>
+					Pit Scout
+					</Button>
+				))
+
+				return buttonsArr
 			},
 		},
 	]

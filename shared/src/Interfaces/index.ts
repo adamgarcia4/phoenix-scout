@@ -23,6 +23,27 @@ export type ScoutedMatchData = {
     }
 }
 
+export type PitScout = {
+  fitUnderTrench: boolean,
+  canClimb: boolean,
+
+  ballCapacity: 0 | 1 | 2 | 3 | 4 | 5,
+  canShootHigh: boolean,
+  canShootLow: boolean,
+
+  canDoStage2Color: boolean,
+  canDoStage3Color: boolean,
+
+  canAutonShoot: boolean,
+  canAutonMove: boolean,
+
+  canShoot: string[],
+
+  wheelSize: string,
+
+  canVisionTrack: boolean,
+}
+
 export type ScoutedMatch = {
   /**
    * Mongo ID

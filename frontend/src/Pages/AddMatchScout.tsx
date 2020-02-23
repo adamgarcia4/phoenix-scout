@@ -13,9 +13,8 @@ import styled from 'styled-components'
 import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
 // import FormGroup from '@material-ui/core/FormGroup'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Paper from '@material-ui/core/Paper'
-import Switch from '@material-ui/core/Switch'
+
 import {
 	useHistory,
 	useParams,
@@ -26,6 +25,8 @@ import {
 	ScoutedMatchData,
 	MatchAPIResponse,
 } from '@shared/Interfaces'
+
+import Toggle from '../ui/Toggle'
 
 import { paths } from '../App'
 import Expansion from '../ui/Expansion'
@@ -96,32 +97,6 @@ const BallCountSection = ({
 	</>
 )
 
-interface IToggleProps {
-	value: boolean,
-	setValue: Function,
-	label: string,
-}
-
-const Toggle = ({ value, setValue, label }: IToggleProps) => {
-	return (
-		<FormControlLabel
-			control={(
-				<Switch
-					checked={value}
-					// TODO: Fix to type safety
-					onChange={(event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-						setValue(checked)
-						return true
-					}}
-					// value="checkedB"
-					color="primary"
-				/>
-			)}
-			label={label}
-		/>
-	)
-}
-
 interface AutonModeProps {
 	numHighSuccess: number;
 	setNumHighSuccess: Function;
@@ -149,11 +124,6 @@ const AutonMode = ({
 }: AutonModeProps) => {
 	return (
 		<Box display="flex" flexDirection="column">
-			<Toggle
-				label="Did Robot Move?"
-				value={didMove}
-				setValue={setDidMove}
-			/>
 			<Box>
 				<BallCountSection
 					title="High Balls Scored"
@@ -182,6 +152,11 @@ const AutonMode = ({
 					incrementFunction={setNumLowFailed}
 				/>
 			</Box>
+			<Toggle
+				label="Did Robot Move?"
+				value={didMove}
+				setValue={setDidMove}
+			/>
 		</Box>
 	)
 }
@@ -480,6 +455,7 @@ export default function AddMatch() {
 				sections={[
 					{
 						title: 'Auton Mode',
+						expanded: true,
 						content: (
 							<AutonMode
 								numHighSuccess={data.auto.numHighSuccess}

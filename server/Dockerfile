@@ -1,4 +1,5 @@
-FROM node:12-alpine as base
+# FROM node:12-alpine as base
+FROM arm32v7/node:12 as base
 
 WORKDIR /workdir/server
 

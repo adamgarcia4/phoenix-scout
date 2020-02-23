@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
 	Typography,
@@ -73,14 +73,24 @@ interface ExpansionProps {
 	sections: {
 		title: string,
 		content: JSX.Element,
+		expanded?: boolean,
 	}[]
 }
 const Expansion = ({
 	sections,
 }: ExpansionProps) => {
 	const classes = useStyles({})
-	// TODO: Option to start with a panel expanded
+	
 	const [expanded, setExpanded] = useState<string | false>(false)
+
+	useEffect(() => {
+		for (const section of sections) {
+			if (section.expanded) {
+				setExpanded(section.title)
+				break
+			}
+		}
+	}, [])
 
 	const handlePanelChange = (panel: string) => (
 		event: React.ChangeEvent<{}>,

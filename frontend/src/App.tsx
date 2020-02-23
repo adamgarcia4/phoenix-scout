@@ -14,10 +14,22 @@ import Header from './components/Header'
 import TeamDetail from './Pages/TeamDetail'
 import TeamsPage from './Pages/Teams'
 import MatchOverview from './Pages/MatchOverview'
+import PitScout from './Pages/PitScout'
 import { StateProvider } from './store'
 
 export const paths = {
 	aboutPage: '/about',
+	pitScout: {
+		get: (teamNum) => {
+			return `pitScout/${teamNum}`
+		},
+		route: '/pitScout/:teamNum',
+		params: (params) => {
+			return {
+				teamNum: params.teamNum,
+			}
+		},
+	},
 	matchOverview: {
 		route: '/match/:matchKey',
 		get: (matchKey) => {
@@ -67,6 +79,9 @@ const App: React.FC = () => (
 					</Route>
 					<Route path={paths.teamsPage}>
 						<TeamsPage />
+					</Route>
+					<Route path={paths.pitScout.route}>
+						<PitScout/>
 					</Route>
 					<Route path={paths.teamDetailsPage.route}>
 						<TeamDetail />
