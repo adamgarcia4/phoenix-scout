@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useReducer, useContext, useEffect } from 'react'
 import {
 	// Button,
 	// Typography,
@@ -8,16 +8,24 @@ import {
 import { PitScout } from '@shared/Interfaces'
 import Select from 'react-select'
 
+import {
+	// useHistory,
+	useParams,
+} from 'react-router-dom'
+
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 
 import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
+import { store } from '../store'
 
 import Expansion from '../ui/Expansion'
 import Toggle from '../ui/Toggle'
+import { paths } from '../App'
 
-const getInitialState: () => PitScout = () => {
+const getInitialState: (teamNum: string) => PitScout = (teamNum) => {
 	return {
+		key: teamNum,
 		fitUnderTrench: false,
 		canClimb: false,
 		ballCapacity: 0,
@@ -72,7 +80,21 @@ const reducer = (prevState: PitScout, action: IActions) => {
 
 export default () => {
 	const styles = useStyles({})
-	const [data, dispatch] = useReducer(reducer, getInitialState())
+	const storeData = useContext(store)
+	const { teamNum } = paths.pitScout.params(useParams())
+
+	const pitScoutData: PitScout = storeData.pitScout.state.documents[teamNum]
+
+	const [data, dispatch] = useReducer(reducer, getInitialState(teamNum))
+
+	useEffect(() => {
+		if (pitScoutData) {
+			dispatch({
+				type: 'initializeData',
+				data: pitScoutData,
+			})
+		}
+	}, [pitScoutData])
 
 	const updateField = (key) => (val) => {
 		dispatch({
@@ -83,7 +105,10 @@ export default () => {
 	}
 
 	const submit = () => {
-		console.log('data:', data)
+		storeData.pitScout.dispatch({
+			type: 'addData',
+			data,
+		})
 	}
 	const ballSelectOptions = [0, 1, 2, 3, 4, 5].map((num) => {
 		return {
@@ -91,6 +116,7 @@ export default () => {
 			value: num,
 		}
 	})
+
 	return (
 		<div>
 			<Expansion
@@ -120,10 +146,7 @@ export default () => {
 										onChange={(newVal: any) => {
 											updateField('ballCapacity')(newVal.value)
 										}}
-										defaultValue={'ballCapacity' in data ? {
-											label: data.ballCapacity,
-											value: data.ballCapacity,
-										} : null}
+										value={ballSelectOptions[data.ballCapacity]}
 									/>
 								</Box>
 								<Box>

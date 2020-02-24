@@ -24,6 +24,14 @@ export type ScoutedMatchData = {
 }
 
 export type PitScout = {
+  /**
+   * Mongo document id if there is one
+   */
+  _id?: string,
+  /**
+   * Team number
+   */
+  key: string,
   fitUnderTrench: boolean,
   canClimb: boolean,
 

@@ -1,7 +1,7 @@
 import React, {
 	createContext,
 } from 'react'
-import { ScoutedMatch, TeamInterface, MatchAPIResponse } from '@shared/Interfaces'
+import { ScoutedMatch, TeamInterface, MatchAPIResponse, PitScout } from '@shared/Interfaces'
 import backendAxios from '../config/backendAxios'
 import usePersistReducer, { State, Action } from './usePersistReducer'
 
@@ -14,6 +14,7 @@ interface ContextInterface {
 	scoutedMatch: ISingleReducer<ScoutedMatch>,
 	teams: ISingleReducer<TeamInterface>,
 	matches: ISingleReducer<MatchAPIResponse>,
+	pitScout: ISingleReducer<PitScout>
 }
 
 const store = createContext<ContextInterface>(null)
@@ -71,6 +72,23 @@ const StateProvider = ({ children }) => {
 		get: getMatches,
 		post: postMatches,
 	})
+
+	const getPitScout = async () => {
+		const res = await backendAxios.get('/pitScout')
+		return res.data
+	}
+
+	const postPitScout = async (dataToUpload) => {
+		const res = await backendAxios.post('/pitScout', {
+			data: dataToUpload,
+		})
+		return res
+	}
+	const pitScoutObj = usePersistReducer<PitScout>({
+		get: getPitScout,
+		post: postPitScout,
+	})
+
 	// need to add copy to localstorage hook too
 	return (
 		<Provider
@@ -78,6 +96,7 @@ const StateProvider = ({ children }) => {
 				scoutedMatch: scoutMatchObj,
 				teams: teamsObj,
 				matches: matchesObj,
+				pitScout: pitScoutObj,
 			}}
 		>
 			{children}
