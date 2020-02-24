@@ -46,18 +46,19 @@ module.exports = () => {
 			new webpack.EnvironmentPlugin({
 				...process.env,
 			}),
-			new WorkboxWebpackPlugin.GenerateSW({
-				swDest: 'sw.js',
-				clientsClaim: true,
-				skipWaiting: true,
-				maximumFileSizeToCacheInBytes: 7000000,
-			}),
-			// new WorkboxWebpackPlugin.InjectManifest({
-			// 	swSrc: './src/sw.js',
+			// new WorkboxWebpackPlugin.GenerateSW({
 			// 	swDest: 'sw.js',
 			// 	clientsClaim: true,
 			// 	skipWaiting: true,
+			// 	maximumFileSizeToCacheInBytes: 7000000,
 			// }),
+			new WorkboxWebpackPlugin.InjectManifest({
+				swSrc: './src/sw.js',
+				swDest: 'sw.js',
+				maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
+				// clientsClaim: true,
+				// skipWaiting: true,
+			}),
 		],
 		devServer: {
 			port: 3000,

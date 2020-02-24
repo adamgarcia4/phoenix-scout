@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "workbox-precaching": "^5.0.0"
+  }
+}
