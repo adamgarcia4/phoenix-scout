@@ -4,6 +4,8 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
+
 module.exports = () => {
 	return {
 		entry: path.join(__dirname, '/src/index.tsx'),
@@ -44,6 +46,18 @@ module.exports = () => {
 			new webpack.EnvironmentPlugin({
 				...process.env,
 			}),
+			new WorkboxWebpackPlugin.GenerateSW({
+				swDest: 'sw.js',
+				clientsClaim: true,
+				skipWaiting: true,
+				maximumFileSizeToCacheInBytes: 7000000,
+			}),
+			// new WorkboxWebpackPlugin.InjectManifest({
+			// 	swSrc: './src/sw.js',
+			// 	swDest: 'sw.js',
+			// 	clientsClaim: true,
+			// 	skipWaiting: true,
+			// }),
 		],
 		devServer: {
 			port: 3000,
