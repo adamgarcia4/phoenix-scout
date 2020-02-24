@@ -24,7 +24,8 @@ services:
     environment:
       WAIT_HOSTS: mongo:27017
   mongo:
-    image: 'mongo'
+    image: 'apcheamitru/arm32v7-mongo'
+    # image: 'mongo'
     volumes:
       - ./data-volume:/data/db
     ports:
