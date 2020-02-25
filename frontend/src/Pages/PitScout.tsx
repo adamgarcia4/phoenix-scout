@@ -9,7 +9,7 @@ import { PitScout } from '@shared/Interfaces'
 import Select from 'react-select'
 
 import {
-	// useHistory,
+	useHistory,
 	useParams,
 } from 'react-router-dom'
 
@@ -80,6 +80,7 @@ const reducer = (prevState: PitScout, action: IActions) => {
 
 export default () => {
 	const styles = useStyles({})
+	const history = useHistory()
 	const storeData = useContext(store)
 	const { teamNum } = paths.pitScout.params(useParams())
 
@@ -109,7 +110,10 @@ export default () => {
 			type: 'addData',
 			data,
 		})
+
+		history.push(paths.teamsPage)
 	}
+
 	const ballSelectOptions = [0, 1, 2, 3, 4, 5].map((num) => {
 		return {
 			label: num,

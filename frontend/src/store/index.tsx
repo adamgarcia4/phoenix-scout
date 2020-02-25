@@ -1,9 +1,10 @@
 import React, {
-	createContext,
+	createContext, useEffect,
 } from 'react'
 import { ScoutedMatch, TeamInterface, MatchAPIResponse, PitScout } from '@shared/Interfaces'
 import backendAxios from '../config/backendAxios'
 import usePersistReducer, { State, Action } from './usePersistReducer'
+import useLocalStorage from '../hooks/useLocalStorage'
 
 interface ISingleReducer<T> {
 	state: State<T>,
@@ -88,6 +89,16 @@ const StateProvider = ({ children }) => {
 		get: getPitScout,
 		post: postPitScout,
 	})
+
+	// const [val, setVal] = useLocalStorage('pit', JSON.parse(window.localStorage.getItem('pit')) || null)
+
+	// console.log('vals:', val)
+
+	useEffect(() => {
+		// console.log('hi')
+		// setVal(JSON.stringify(pitScoutObj.state.documents))
+	}, [pitScoutObj.state.documents])
+	
 
 	// need to add copy to localstorage hook too
 	return (

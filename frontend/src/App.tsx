@@ -54,6 +54,9 @@ export const paths = {
 		},
 	},
 	teamsPage: '/teams',
+	addTeams: {
+		route: '/addTeams',
+	},
 	teamDetailsPage: {
 		route: '/team-detail/:teamNum/',
 		get: (teamNum) => `/team-detail/${teamNum}`,
