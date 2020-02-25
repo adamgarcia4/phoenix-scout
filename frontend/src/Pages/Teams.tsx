@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
-import { ScoutedMatch } from '@shared/Interfaces'
-import { TeamInterface } from '../Interfaces'
+import { ScoutedMatch, TeamInterface } from '@shared/Interfaces'
 import Table, { HeadersInterface } from '../ui/Table'
 import { store } from '../store'
 import { paths } from '../App'
@@ -21,6 +20,17 @@ const Teams = () => {
 		{
 			name: 'Name',
 			key: 'nickname',
+		},
+		{
+			name: 'Pit Scouted?',
+			key: 'pitScout',
+			getValue: (row: TeamInterface) => {
+				if (row.key in value.pitScout.state.documents) {
+					return 'Yes'
+				}
+
+				return 'No'
+			},
 		},
 		{
 			name: 'Team Details',
