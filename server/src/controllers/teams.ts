@@ -35,8 +35,6 @@ router.post('/seed', async (req, res) => {
 		eventId,
 	} = req.body
 
-	console.log('eventId:', eventId)
-
 	if (!eventId) {
 		return res.status(404).json({
 			error: 'cannot find eventId',

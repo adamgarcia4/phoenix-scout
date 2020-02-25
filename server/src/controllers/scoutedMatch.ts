@@ -124,58 +124,6 @@ router.post('/seedEvent', async (req, res) => {
 	try {
 		const response: AxiosResponse<MatchAPIResponse[]> = await tbaAxios.get(`/event/${eventId}/matches`)
 
-		const scoutMatches: ScoutedMatch[] = []
-
-		for (const match of response.data) {
-			const { alliances } = match
-
-			if (match.comp_level === 'qm' && alliances) {
-				for (const teamKey of alliances.red.team_keys) {
-					scoutMatches.push({
-						key: `${match.key}_${teamKey}`,
-						match: match.key,
-						// time: match.time || 0,
-						team: teamKey,
-						compLevel: match.comp_level,
-						side: 'red',
-						// status: 'toBeAssigned',
-						// fromAPI: true,
-					})
-				}
-
-				for (const teamKey of alliances.blue.team_keys) {
-					scoutMatches.push({
-						key: `${match.key}_${teamKey}`,
-						match: match.key,
-						// time: match.time || 0,
-						team: teamKey,
-						compLevel: match.comp_level,
-						side: 'blue',
-						// status: 'toBeAssigned',
-						// fromAPI: true,
-					})
-				}
-			}
-		}
-
-		const coll = getColl()
-
-		const bulkReplaceOps: any[] = []
-
-		for (const scoutMatch of scoutMatches) {
-			bulkReplaceOps.push({
-				replaceOne: {
-					filter: {
-						key: scoutMatch.key,
-					},
-					replacement: scoutMatch,
-					upsert: true,
-				},
-			})
-		}
-
-		const writeResponse = await coll.bulkWrite(bulkReplaceOps)
-
 		await db.collection('matches').bulkWrite(response.data.filter((match) => match.comp_level === 'qm').map((match) => {
 			return {
 				replaceOne: {
@@ -187,10 +135,7 @@ router.post('/seedEvent', async (req, res) => {
 				},
 			}
 		}))
-
-		console.log('writeResponse:', writeResponse)
-
-		res.send('true')
+		res.send('good')
 	} catch (error) {
 		res.status(400).send('Something happened!')
 	}

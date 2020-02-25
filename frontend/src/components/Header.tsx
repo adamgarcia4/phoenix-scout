@@ -234,7 +234,7 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 						</ListItemIcon>
 						<ListItemText primary="Admin Utils" />
 					</ListItem>
-					<ListItem
+					{/* <ListItem
 						selected={isPath(paths.addTeams.route)}
 						button
 						onClick={() => navigateToPath(paths.addTeams.route)}
@@ -253,7 +253,7 @@ function PersistentDrawerLeft({ children }: {children: any}) {
 							<SupervisorAccountIcon />
 						</ListItemIcon>
 						<ListItemText primary="Admin Utils" />
-					</ListItem>
+					</ListItem> */}
 				</List>
 				<Divider />
 			</Drawer>
