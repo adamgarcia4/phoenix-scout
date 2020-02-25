@@ -10,6 +10,8 @@ COPY package*.json ./
 COPY ts*.json ./
 COPY webpack.config.js ./
 COPY ./public/ ./public
+COPY ./build-utils ./build-utils
+COPY ./server.js ./server.js
 
 RUN npm install --quiet --unsafe-perm --no-progress --no-audit --only=production
 
