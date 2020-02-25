@@ -390,6 +390,8 @@ export default function AddMatch() {
 
 	const [data, dispatch] = useReducer(matchReducer, getInitialState())
 
+	// console.log('data:', data)
+	
 	const [oldData, setOldData] = useState(undefined)
 
 	useEffect(() => {

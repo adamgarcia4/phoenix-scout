@@ -84,7 +84,7 @@ const App: React.FC = () => (
 						<TeamsPage />
 					</Route>
 					<Route path={paths.pitScout.route}>
-						<PitScout/>
+						<PitScout />
 					</Route>
 					<Route path={paths.teamDetailsPage.route}>
 						<TeamDetail />
