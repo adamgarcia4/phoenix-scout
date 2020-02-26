@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: development
-    command: yarn run dev
+    command: yarn run prod
     ports:
       - '3000:3000'
     volumes:
