@@ -1,39 +1,12 @@
-import React, { useContext } from 'react'
+import React, { useContext, useReducer, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import {
-	Theme,
-} from '@material-ui/core'
 import { ScoutedMatch, PitScout } from '@shared/Interfaces'
-import { makeStyles, createStyles } from '@material-ui/core/styles'
+import TextField from '@material-ui/core/TextField'
 import { store } from '../store'
-
+import Button from '@material-ui/core/Button'
 import SummaryPanel from '../ui/SummaryPanel'
 import Expansion from '../ui/Expansion'
 import Table from '../ui/Table'
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-	root: {
-		width: '100%',
-	},
-	saveFab: {
-		position: 'absolute',
-		right: theme.spacing(2),
-		bottom: theme.spacing(2),
-	},
-	matchSummaryContainer: {
-		padding: '10px',
-		marginBottom: '15px',
-		display: 'flex',
-	},
-	fieldContainer: {
-		display: 'flex',
-		flexDirection: 'column',
-		flex: 1,
-	},
-	fieldContainerLabel: {
-		fontWeight: 'bold',
-	},
-}))
 
 const headers = [
 	{
@@ -70,8 +43,6 @@ interface IPitSummary {
 
 const PitSummary = ({ pitScoutData }: IPitSummary) => {
 	if (!pitScoutData) return null
-
-	const styles = useStyles({})
 
 	const getBoolString = (val: boolean) => {
 		return val ? 'Yes' : 'No'
@@ -148,15 +119,61 @@ const PitSummary = ({ pitScoutData }: IPitSummary) => {
 		/>
 	)
 }
+
+const getInitialState: (teamNum: string) => PitScout = (teamNum) => {
+	return {
+		key: teamNum,
+		fitUnderTrench: false,
+		canClimb: false,
+		ballCapacity: 0,
+		canShootHigh: false,
+		canShootLow: false,
+
+		canDoStage2Color: false,
+		canDoStage3Color: false,
+
+		canAutonShoot: false,
+		canAutonMove: false,
+
+		canShoot: [],
+
+		wheelSize: '',
+
+		canVisionTrack: false,
+		comments: '',
+	}
+}
+
+type IActions = {
+	type: 'initializeData',
+	data: PitScout
+} | {
+	type: 'updateField',
+	key: string,
+	value: any,
+}
+
+const reducer = (prevState: PitScout, action: IActions) => {
+	switch (action.type) {
+	case 'initializeData':
+		return action.data
+
+	case 'updateField':
+		return {
+			...prevState,
+			[action.key]: action.value,
+		}
+	default:
+		return prevState
+	}
+}
+
 const TeamDetail = () => {
 	const value = useContext(store)
-	const styles = useStyles({})
 	const params = useParams<{ teamNum: string }>()
 	const { teamNum } = params
 
 	const teamDetails = value.teams.state.documents?.[teamNum] || undefined
-
-	// console.log('teamDetails:', teamDetails)
 
 	const teamMatchScoutsArr = Object.values(value.scoutedMatch.state.documents)
 		.filter((match) => {
@@ -167,21 +184,32 @@ const TeamDetail = () => {
 		})
 
 	const pitScout = value.pitScout.state.documents?.[teamNum]
-	console.log('pitScout:', pitScout)
 
-	console.log('teamMatchScoutsArr:', teamMatchScoutsArr)
+	const [pitScoutData, dispatch] = useReducer(reducer, getInitialState(teamNum))
+
+	useEffect(() => {
+		if (pitScout) {
+			dispatch({
+				type: 'initializeData',
+				data: pitScout,
+			})
+		}
+	}, [pitScout])
 
 	return (
 		<div>
 			<h1>{`Team ${teamDetails?.team_number}: ${teamDetails?.nickname}`}</h1>
 
 			<Expansion
+				style={{
+					marginBottom: '5px',
+				}}
 				sections={[
 					{
 						title: 'Robot Stats',
 						content: (
 							<PitSummary
-								pitScoutData={pitScout}
+								pitScoutData={pitScoutData}
 							/>
 						),
 					},
@@ -194,8 +222,38 @@ const TeamDetail = () => {
 							/>
 						),
 					},
+					{
+						title: 'Comments',
+						content: (
+							<div>
+								<TextField
+									multiline
+									fullWidth
+									value={pitScoutData.comments}
+									onChange={(newVal) => {
+										dispatch({
+											type: 'updateField',
+											key: 'comments',
+											value: newVal.target.value,
+										})
+									}}
+								/>
+							</div>
+						),
+					},
 				]}
 			/>
+			<Button
+				variant="contained"
+				onClick={() => {
+					value.pitScout.dispatch({
+						type: 'addData',
+						data: pitScoutData,
+					})
+				}}
+			>
+				Update Data
+			</Button>
 		</div>
 	)
 }

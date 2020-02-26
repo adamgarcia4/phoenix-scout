@@ -50,6 +50,7 @@ export type PitScout = {
   wheelSize: string,
 
   canVisionTrack: boolean,
+  comments: string,
 }
 
 export type ScoutedMatch = {

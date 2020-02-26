@@ -15,6 +15,7 @@ import {
 
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 
+import TextField from '@material-ui/core/TextField'
 import SaveIcon from '@material-ui/icons/Save'
 import Fab from '@material-ui/core/Fab'
 import { store } from '../store'
@@ -43,6 +44,7 @@ const getInitialState: (teamNum: string) => PitScout = (teamNum) => {
 		wheelSize: '',
 
 		canVisionTrack: false,
+		comments: '',
 	}
 }
 
@@ -186,6 +188,15 @@ export default () => {
 										label="Can Shoot in Auton?"
 										value={data.canAutonShoot}
 										setValue={updateField('canAutonShoot')}
+									/>
+								</Box>
+								<Box>
+									<TextField
+										label="Wheel Size?"
+										value={data.wheelSize}
+										onChange={((newVal) => {
+											updateField('wheelSize')(newVal.target.value)
+										})}
 									/>
 								</Box>
 								<Box>

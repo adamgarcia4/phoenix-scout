@@ -70,6 +70,7 @@ const ExpansionSection = ({
 }
 
 interface ExpansionProps {
+	style?: React.CSSProperties,
 	sections: {
 		title: string,
 		content: JSX.Element,
@@ -78,6 +79,7 @@ interface ExpansionProps {
 }
 const Expansion = ({
 	sections,
+	style,
 }: ExpansionProps) => {
 	const classes = useStyles({})
 	
@@ -100,7 +102,7 @@ const Expansion = ({
 	}
 
 	return (
-		<div className={classes.root}>
+		<div className={classes.root} style={style || {}}>
 			{sections.map((section) => {
 				return (
 					<ExpansionSection
