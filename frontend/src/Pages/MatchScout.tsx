@@ -88,18 +88,13 @@ const getMatch = (comp_level: any, match_number: number, blueTeams, redTeams): M
 
 interface MatchForm {
 	editAction: string | false,
-	updateMatch: Function
+	updateMatch: Function,
+	teamsList: string[],
 }
 
-const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch }: MatchForm) => {
+const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch, teamsList }: MatchForm) => {
 	const classes = useStyles({})
-	// const randomNum = Math.floor(Math.random() * 100) + 100
-	// const comp_level = 'pr'
-	// const event_key = `2020isde1_${comp_level}${randomNum}`
 
-
-	// blue teams
-	// red teams
 	const matchTypes = ['pr', 'qm', 'ef', 'qf', 'sf', 'f']
 
 	const [matchType, setMatchType] = useState('pr')
@@ -107,10 +102,7 @@ const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch }: Ma
 	const [blueTeams, setBlueTeams] = useState([])
 	const [redTeams, setRedTeams] = useState([])
 
-	console.log('blueTeams:', blueTeams)
-	console.log('redTeams:', redTeams)
-
-	const matchTypeOptions = matchTypes.map((type) => ({ label: type, value: type }))
+	const teamsListOptions = teamsList.map((team) => ({ label: team, value: team }))
 
 	if (!editAction) {
 		return null
@@ -144,7 +136,7 @@ const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch }: Ma
 			<div style={{
 				display: 'flex',
 				flexDirection: 'column',
-				width: '200px',
+				width: '250px',
 			}}
 			>
 				<Select
@@ -154,7 +146,7 @@ const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch }: Ma
 						}),
 					}}
 					placeholder="Blue"
-					options={matchTypeOptions}
+					options={teamsListOptions}
 					onChange={(selectedVal: any[]) => {
 						if (!selectedVal) {
 							setBlueTeams([])
@@ -174,7 +166,7 @@ const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch }: Ma
 						}),
 					}}
 					placeholder="Red"
-					options={matchTypeOptions}
+					options={teamsListOptions}
 					onChange={(selectedVal: any[]) => {
 						if (!selectedVal) {
 							setRedTeams([])
@@ -205,7 +197,6 @@ const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch }: Ma
 				variant="contained"
 				onClick={() => {
 					const match = getMatch(matchType, matchNumber, blueTeams, redTeams)
-					console.log('match:', match)
 					updateMatch(match)
 				}}
 				color="primary"
@@ -222,21 +213,14 @@ const MatchScout: React.FC = () => {
 	const classes = useStyles({})
 
 	const relevantMatches = Object.values(value.matches.state.documents)
-		// .filter((match) => {
-		// 	return match.comp_level === 'qm'
-		// })
 		.sort((a, b) => a.match_number - b.match_number)
 
 	const scoutedMatches = Object.values(value.scoutedMatch.state.documents)
 
 	const [teamsToScout, setTeamsToScout] = useState<{[key: string]: string}>({})
 
-	// 'add' for new entry, 'qm1' for existing
+	// TODO: 'qm1' for existing
 	const [editAction, setEditAction] = useState<string | false>(false)
-
-	// setEditAction(1)
-
-	// value.matches.state.documents
 
 	const headers: HeadersInterface[] = [
 		{
@@ -352,6 +336,7 @@ const MatchScout: React.FC = () => {
 								data: match,
 							})
 						}}
+						teamsList={Object.keys(value.teams.state.documents)}
 					/>
 				)}
 			/>
