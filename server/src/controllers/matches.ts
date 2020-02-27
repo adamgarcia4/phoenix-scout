@@ -1,69 +1,79 @@
-import { AxiosResponse } from 'axios'
-import { Router } from 'express'
-import { MatchAPIResponse } from '@shared/Interfaces'
-import { ObjectID, ReplaceWriteOpResult } from 'mongodb'
+import { AxiosResponse } from "axios"
+import { Router } from "express"
+import { MatchAPIResponse } from "@shared/Interfaces"
+import { ObjectID, ReplaceWriteOpResult } from "mongodb"
 
-import tbaAxios from '../config/tbaAxios'
+import tbaAxios from "../config/tbaAxios"
 
-import { db } from '../config/database'
+import { db } from "../config/database"
 
 const router = Router()
 
-const getColl = () => db.collection('matches')
+const getColl = () => db.collection("matches")
 
-router.get('/', async (req, res) => {
-	const coll = getColl()
-	const data = await coll.find({}).toArray()
+router.get("/", async (req, res) => {
+  const coll = getColl()
+  const data = await coll.find({}).toArray()
 
-	res.send(data)
+  res.send(data)
 })
 
 interface IPostReq {
-	body: {
-		data: MatchAPIResponse[]
-	}
+  body: {
+    data: MatchAPIResponse[]
+  }
 }
 
-router.post('/', async (req: IPostReq, res) => {
-	const coll = getColl()
+router.post("/", async (req: IPostReq, res) => {
+  const coll = getColl()
 
-	const { data } = req.body
+  const { data } = req.body
 
-	if (!data || data.length === 0) {
-		return res.json({
-			data: [],
-		})
-	}
+  if (!data || data.length === 0) {
+    return res.json({
+      data: []
+    })
+  }
 
-	const updatesArr: Promise<ReplaceWriteOpResult>[] = []
+  console.log("data12:", data)
 
-	for (const doc of data) {
-		let response: Promise<ReplaceWriteOpResult> | undefined
+  const updatesArr: Promise<ReplaceWriteOpResult>[] = []
 
-		// Document exists, so need to update the doc.
-		if (doc._id) {
-			const { _id } = doc
-			delete doc._id
+  for (const doc of data) {
+    let response: Promise<ReplaceWriteOpResult> | undefined
 
-			response = coll.replaceOne({
-				_id: new ObjectID(_id),
-			}, doc, {
-				upsert: true,
-			})
-		} else {
-			// Document does not exist, so
-			response = coll.replaceOne({
-				key: doc.key,
-			}, doc, {
-				upsert: true,
-			})
-		}
-		updatesArr.push(response)
-	}
+    // Document exists, so need to update the doc.
+    if (doc._id) {
+      const { _id } = doc
+      delete doc._id
 
-	await Promise.all(updatesArr)
+      response = coll.replaceOne(
+        {
+          _id: new ObjectID(_id)
+        },
+        doc,
+        {
+          upsert: true
+        }
+      )
+    } else {
+      // Document does not exist, so
+      response = coll.replaceOne(
+        {
+          key: doc.key
+        },
+        doc,
+        {
+          upsert: true
+        }
+      )
+    }
+    updatesArr.push(response)
+  }
 
-	return res.send('success')
+  await Promise.all(updatesArr)
+
+  return res.send("success")
 })
 
 // router.post('/seed', async (req, res) => {

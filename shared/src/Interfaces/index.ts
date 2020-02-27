@@ -81,7 +81,7 @@ export type ScoutedMatch = {
   /**
    * The competition level the match was played at.
    */
-  compLevel: "qm" | "ef" | "qf" | "sf" | "f"
+  compLevel: "pr" | "qm" | "ef" | "qf" | "sf" | "f"
   /**
    * Alliance Side
    */
@@ -156,7 +156,7 @@ export type MatchAPIResponse = {
   /**
    * The competition level the match was played at.
    */
-  comp_level: "qm" | "ef" | "qf" | "sf" | "f"
+  comp_level: "pr" | "qm" | "ef" | "qf" | "sf" | "f"
   /**
    * The set number in a series of matches where more than one match is required
    * in the match series.

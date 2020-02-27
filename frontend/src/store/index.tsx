@@ -66,7 +66,7 @@ const StateProvider = ({ children }) => {
 	}
 
 	const postMatches = async (dataToUpload) => {
-		const res = await backendAxios.post('/teams', {
+		const res = await backendAxios.post('/matches', {
 			data: dataToUpload,
 		})
 		return res

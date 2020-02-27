@@ -65,6 +65,7 @@ interface TableProps {
 	data?: DataInterface[] | undefined,
 	options?: ITableOptions,
 	styles?: React.CSSProperties,
+	headerQuickAction?: React.ReactNode,
 }
 
 interface HeaderComponentProps {
@@ -141,7 +142,7 @@ const SearchInput = ({ options, setGlobalFilter, globalFilter }) => {
 	)
 }
 const TableComponent = ({
-	headers, data, options, styles,
+	headers, data, options, styles, headerQuickAction,
 }: TableProps) => {
 	const classes = useStyles({})
 
@@ -202,11 +203,19 @@ const TableComponent = ({
 				...(styles || {}),
 			}}
 			>
-				<SearchInput
-					options={options}
-					globalFilter={globalFilter}
-					setGlobalFilter={setGlobalFilter}
-				/>
+				<div style={{
+					display: 'flex',
+					justifyContent: 'space-between',
+				}}
+				>
+					<SearchInput
+						options={options}
+						globalFilter={globalFilter}
+						setGlobalFilter={setGlobalFilter}
+					/>
+
+					{headerQuickAction || null}
+				</div>
 				<TableContainer style={{ minHeight: '400px' }}>
 					<Table className={classes.table} aria-label="simple table">
 						<HeaderComponent headers={headerGroups} />
