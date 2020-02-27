@@ -198,8 +198,11 @@ const AddOrEditMatchForm: React.FC<MatchForm> = ({ editAction, updateMatch, team
 				onClick={() => {
 					const match = getMatch(matchType, matchNumber, blueTeams, redTeams)
 					updateMatch(match)
+					setMatchNumber(1)
+					setMatchType('pr')
 				}}
 				color="primary"
+				disabled={!(blueTeams.length === 3 && redTeams.length === 3)}
 			>
 				Submit
 			</Button>
