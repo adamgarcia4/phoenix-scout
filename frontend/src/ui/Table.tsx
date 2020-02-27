@@ -63,7 +63,8 @@ interface ITableOptions {
 interface TableProps {
 	headers: HeadersInterface[],
 	data?: DataInterface[] | undefined,
-	options?: ITableOptions
+	options?: ITableOptions,
+	styles?: React.CSSProperties,
 }
 
 interface HeaderComponentProps {
@@ -139,7 +140,9 @@ const SearchInput = ({ options, setGlobalFilter, globalFilter }) => {
 		/>
 	)
 }
-const TableComponent = ({ headers, data, options }: TableProps) => {
+const TableComponent = ({
+	headers, data, options, styles,
+}: TableProps) => {
 	const classes = useStyles({})
 
 	const cols = (headers || []).map((header) => {
@@ -193,7 +196,12 @@ const TableComponent = ({ headers, data, options }: TableProps) => {
 
 	return (
 		<>
-			<Paper style={{ padding: '10px' }}>
+			<Paper style={{
+				padding: '10px',
+				width: '100%',
+				...(styles || {}),
+			}}
+			>
 				<SearchInput
 					options={options}
 					globalFilter={globalFilter}

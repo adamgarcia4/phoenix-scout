@@ -1,67 +1,67 @@
 export type User = {
-  name: string,
+  name: string
 }
 
 export type ScoutedMatchData = {
   auto: {
-    numHighSuccess: number,
-    numHighFailed: number,
-    numLowSuccess: number,
-    numLowFailed: number,
-    didMove: boolean,
-  },
+    numHighSuccess: number
+    numHighFailed: number
+    numLowSuccess: number
+    numLowFailed: number
+    didMove: boolean
+  }
   tele: {
-      numHighSuccess: number,
-      numHighFailed: number,
-      numLowSuccess: number,
-      numLowFailed: number,
-      fitUnderTrench: boolean,
-      stage2Color: boolean,
-      stage3Color: boolean,
-      attemptedClimb: boolean,
-      climbSuccess: boolean,
-    }
+    numHighSuccess: number
+    numHighFailed: number
+    numLowSuccess: number
+    numLowFailed: number
+    fitUnderTrench: boolean
+    stage2Color: boolean
+    stage3Color: boolean
+    attemptedClimb: boolean
+    climbSuccess: boolean
+  }
 }
 
 export type PitScout = {
   /**
    * Mongo document id if there is one
    */
-  _id?: string,
+  _id?: string
   /**
    * Team number
    */
-  key: string,
-  fitUnderTrench: boolean,
-  canClimb: boolean,
+  key: string
+  fitUnderTrench: boolean
+  canClimb: boolean
 
-  ballCapacity: 0 | 1 | 2 | 3 | 4 | 5,
-  canShootHigh: boolean,
-  canShootLow: boolean,
+  ballCapacity: 0 | 1 | 2 | 3 | 4 | 5
+  canShootHigh: boolean
+  canShootLow: boolean
 
-  canDoStage2Color: boolean,
-  canDoStage3Color: boolean,
+  canDoStage2Color: boolean
+  canDoStage3Color: boolean
 
-  canAutonShoot: boolean,
-  canAutonMove: boolean,
+  canAutonShoot: boolean
+  canAutonMove: boolean
 
-  canShoot: string[],
+  canShoot: string[]
 
-  wheelSize: string,
+  wheelSize: string
 
-  canVisionTrack: boolean,
-  comments: string,
+  canVisionTrack: boolean
+  comments: string
 }
 
 export type ScoutedMatch = {
   /**
    * Mongo ID
    */
-  _id?: string,
+  _id?: string
   /**
    * Defined as `<MATCHAPI.key>_frc<TbaTeamKey>`
    */
-  key: string,
+  key: string
   // /**
   //  * Shows what state the scouted match is in.
   //  */
@@ -69,11 +69,11 @@ export type ScoutedMatch = {
   /**
    * Match Key identifier.
    */
-  match: string,
+  match: string
   /**
    * Team Key identifier
    */
-  team: string,
+  team: string
   // /**
   //  * Start time of match, as set by the FIRST schedule.
   //  */
@@ -81,15 +81,15 @@ export type ScoutedMatch = {
   /**
    * The competition level the match was played at.
    */
-  compLevel: 'qm' | 'ef' | 'qf' | 'sf' | 'f',
+  compLevel: "qm" | "ef" | "qf" | "sf" | "f"
   /**
    * Alliance Side
    */
-  side: 'red' | 'blue',
+  side: "red" | "blue"
   /**
    * This is the actual scouted data
    */
-  data?: ScoutedMatchData,
+  data?: ScoutedMatchData
   // fromAPI?: boolean,
   /**
    * The profile of the scout assigned
@@ -109,12 +109,15 @@ export type ScoutedMatch = {
 // }
 
 export type TeamInterface = {
-  city: string,
-  country: string,
-  key: string,
-  name: string,
-  nickname: string,
-  state_prov: string,
+  city: string
+  country: string
+  /**
+   * Eg: `frc4`
+   */
+  key: string
+  name: string
+  nickname: string
+  state_prov: string
   team_number: number
 }
 
@@ -122,15 +125,15 @@ type MatchAlliance = {
   /**
    * Score for this alliance.  Will be null or -1 for an unplayed match
    */
-  score: number,
+  score: number
   /**
    * TBA Team keys (eg: frc254) for teams on this alliance
    */
-  team_keys: string[],
+  team_keys: string[]
   /**
    * TBA team keys (eg frc254) of any teams playing as a surrogate.
    */
-  surrogate_team_keys?: string[],
+  surrogate_team_keys?: string[]
   /**
    * TBA team keys (eg frc254) of any disqualified teams.
    */
@@ -141,7 +144,7 @@ type MatchAlliance = {
  * Response from `/event/{event_key}/matches`
  */
 export type MatchAPIResponse = {
-  _id?: string,
+  _id?: string
   /**
    * TBA match key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER],
    *  where yyyy is the year, and EVENT_CODE is the event code of the event,
@@ -149,61 +152,61 @@ export type MatchAPIResponse = {
    * the competition level. A set number may be appended to the competition
    * level if more than one match in required per set.
    */
-  key: string,
+  key: string
   /**
    * The competition level the match was played at.
    */
-  comp_level: 'qm' | 'ef' | 'qf' | 'sf' | 'f',
+  comp_level: "qm" | "ef" | "qf" | "sf" | "f"
   /**
    * The set number in a series of matches where more than one match is required
    * in the match series.
    */
-  set_number: number,
+  set_number: number
   /**
    * The match number of the match in the competition level.
    */
-  match_number: number,
+  match_number: number
   /**
    * A list of alliances, the teams on the alliances, and their score.
    */
   alliances?: {
-    red: MatchAlliance,
-    blue: MatchAlliance,
-  },
+    red: MatchAlliance
+    blue: MatchAlliance
+  }
   /**
    * The color (red/blue) of the winning alliance. Will contain an empty string
    * in the event of no winner, or a tie.
    */
-  winning_alliance?: string,
+  winning_alliance?: string
   /**
    * Event key of the event the match was played at.
    */
-  event_key: string,
+  event_key: string
   /**
    * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the scheduled match
    * time, as taken from the published schedule.
    */
-  time?: number,
+  time?: number
   /**
    * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of actual match start
    * time.
    */
-  actual_time?: number,
+  actual_time?: number
   /**
    * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) of the TBA predicted
    * match start time.
    */
-  predicted_time?: number,
+  predicted_time?: number
   /**
    * UNIX timestamp (seconds since 1-Jan-1970 00:00:00) when the match result
    * was posted.
    */
-  post_result_time?: number,
+  post_result_time?: number
   /**
    * Score breakdown for auto, teleop, etc. points. Varies from year to year.
    * May be null.
    */
-  score_breakdown?: any,
+  score_breakdown?: any
   /**
    * Array of video objects associated with this match.
    */
@@ -211,15 +214,15 @@ export type MatchAPIResponse = {
     /**
      * Can be one of 'youtube' or 'tba'
      */
-    type: string,
+    type: string
     /**
      * Unique key representing this video
      */
-    key: string,
-  }[],
+    key: string
+  }[]
 }
 
 export type MatchInterface = {
-  name: string,
-  teams: number[],
+  name: string
+  teams: number[]
 }

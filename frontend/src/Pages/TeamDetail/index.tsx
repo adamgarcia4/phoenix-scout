@@ -1,41 +1,12 @@
 import React, { useContext, useReducer, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { ScoutedMatch, PitScout } from '@shared/Interfaces'
+import { PitScout } from '@shared/Interfaces'
 import TextField from '@material-ui/core/TextField'
-import { store } from '../store'
 import Button from '@material-ui/core/Button'
-import SummaryPanel from '../ui/SummaryPanel'
-import Expansion from '../ui/Expansion'
-import Table from '../ui/Table'
-
-const headers = [
-	{
-		name: 'Match #',
-		key: 'match',
-	},
-	{
-		name: 'autoHigh',
-		// TODO: Fix so I don't need this key
-		key: 'autoHigh',
-		getValue: (row: ScoutedMatch) => {
-			return `${row?.data.auto.numHighSuccess}/${row?.data.auto.numHighFailed}`
-		},
-	},
-	{
-		name: 'autoLow',
-		key: 'autoLow',
-		getValue: (row: ScoutedMatch) => {
-			return `${row?.data.auto.numLowSuccess}/${row?.data.auto.numLowFailed}`
-		},
-	},
-	{
-		name: 'autoMoved',
-		key: 'didMove',
-		getValue: (row: ScoutedMatch) => {
-			return row?.data.auto.didMove ? 'Yes' : 'No'
-		},
-	},
-]
+import { store } from '../../store'
+import SummaryPanel from '../../ui/SummaryPanel'
+import Expansion from '../../ui/Expansion'
+import TeamMatchTable from './TeamMatchTable'
 
 interface IPitSummary {
 	pitScoutData: PitScout
@@ -175,14 +146,6 @@ const TeamDetail = () => {
 
 	const teamDetails = value.teams.state.documents?.[teamNum] || undefined
 
-	const teamMatchScoutsArr = Object.values(value.scoutedMatch.state.documents)
-		.filter((match) => {
-			return (
-				match.team === teamNum
-				&& match.data
-			)
-		})
-
 	const pitScout = value.pitScout.state.documents?.[teamNum]
 
 	const [pitScoutData, dispatch] = useReducer(reducer, getInitialState(teamNum))
@@ -196,9 +159,13 @@ const TeamDetail = () => {
 		}
 	}, [pitScout])
 
+	if (!teamDetails) {
+		return null
+	}
+
 	return (
 		<div>
-			<h1>{`Team ${teamDetails?.team_number}: ${teamDetails?.nickname}`}</h1>
+			<h1>{`Team ${teamDetails.team_number}: ${teamDetails.nickname}`}</h1>
 
 			<Expansion
 				style={{
@@ -216,9 +183,8 @@ const TeamDetail = () => {
 					{
 						title: 'Matches',
 						content: (
-							<Table
-								headers={headers}
-								data={teamMatchScoutsArr}
+							<TeamMatchTable
+								teamNum={teamDetails.key}
 							/>
 						),
 					},

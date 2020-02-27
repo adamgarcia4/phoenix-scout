@@ -58,14 +58,13 @@ interface ISummaryProps {
 }
 
 const SummaryPanel = ({ data, isVertical = true }: ISummaryProps) => {
-	const styles = useStyles({})
-
 	return (
 		<Paper style={{
 			padding: '10px',
 			marginBottom: '15px',
 			display: 'flex',
 			flexDirection: isVertical ? 'row' : 'column',
+			flexFlow: 'wrap',
 		}}
 		>
 			{data.map((groupField) => {

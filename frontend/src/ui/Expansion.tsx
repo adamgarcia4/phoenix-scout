@@ -82,7 +82,7 @@ const Expansion = ({
 	style,
 }: ExpansionProps) => {
 	const classes = useStyles({})
-	
+
 	const [expanded, setExpanded] = useState<string | false>(false)
 
 	useEffect(() => {
