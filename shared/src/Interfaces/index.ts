@@ -46,6 +46,7 @@ export type PitScout = {
   canAutonMove: boolean
 
   canShoot: string[]
+  canPickUp: string[]
 
   wheelSize: string
 

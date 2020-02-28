@@ -27,6 +27,7 @@ const PitSummary = ({ pitScoutData }: IPitSummary) => {
 		canDoStage2Color,
 		canDoStage3Color,
 		canShoot,
+		canPickUp,
 		canShootHigh,
 		canShootLow,
 		canVisionTrack,
@@ -63,8 +64,12 @@ const PitSummary = ({ pitScoutData }: IPitSummary) => {
 					value: getBoolString(canDoStage3Color),
 				},
 				{
-					label: 'Can Shoot',
-					value: JSON.stringify(canShoot),
+					label: 'Can Shoot From',
+					value: (canShoot || []).join(', '),
+				},
+				{
+					label: 'Can Pick up from',
+					value: (canPickUp || []).join(', '),
 				},
 				{
 					label: 'Shoot High',
@@ -107,6 +112,7 @@ const getInitialState: (teamNum: string) => PitScout = (teamNum) => {
 		canAutonMove: false,
 
 		canShoot: [],
+		canPickUp: [],
 
 		wheelSize: '',
 

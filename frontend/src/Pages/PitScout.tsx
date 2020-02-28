@@ -7,6 +7,7 @@ import {
 } from '@material-ui/core'
 import { PitScout } from '@shared/Interfaces'
 import Select from 'react-select'
+import CreatableSelect from 'react-select/creatable'
 
 import {
 	useHistory,
@@ -14,6 +15,7 @@ import {
 } from 'react-router-dom'
 
 import { makeStyles, createStyles } from '@material-ui/core/styles'
+
 
 import TextField from '@material-ui/core/TextField'
 import SaveIcon from '@material-ui/icons/Save'
@@ -40,6 +42,7 @@ const getInitialState: (teamNum: string) => PitScout = (teamNum) => {
 		canAutonMove: false,
 
 		canShoot: [],
+		canPickUp: [],
 
 		wheelSize: '',
 
@@ -80,6 +83,7 @@ const reducer = (prevState: PitScout, action: IActions) => {
 	}
 }
 
+const valToOption = (val) => ({ label: val, value: val })
 export default () => {
 	const styles = useStyles({})
 	const history = useHistory()
@@ -122,6 +126,28 @@ export default () => {
 			value: num,
 		}
 	})
+
+	const defaultShootFromOptions = [
+		{
+			label: 'anywhere',
+			value: 'anywhere',
+		},
+		{
+			label: 'trench',
+			value: 'trench',
+		},
+	]
+
+	const defaultPickUpFromOptions = [
+		{
+			label: 'feeder station',
+			value: 'feeder station',
+		},
+		{
+			label: 'floor',
+			value: 'floor',
+		},
+	]
 
 	return (
 		<div>
@@ -211,6 +237,52 @@ export default () => {
 										label="Can Vision Track"
 										value={data.canVisionTrack}
 										setValue={updateField('canVisionTrack')}
+									/>
+								</Box>
+								<Box>
+									<CreatableSelect
+										styles={{
+											container: (provided, state) => ({
+												...provided,
+											}),
+										}}
+										placeholder="Shoots from..."
+										options={defaultShootFromOptions}
+										value={(data.canShoot || []).map(valToOption)}
+										onChange={(selectedVal: any[]) => {
+											if (!selectedVal) {
+												updateField('canShoot')(null)
+												return
+											}
+
+											const valueArr = selectedVal.map((item) => item.value)
+
+											updateField('canShoot')(valueArr)
+										}}
+										isMulti
+									/>
+								</Box>
+								<Box>
+									<Select
+										styles={{
+											container: (provided, state) => ({
+												...provided,
+											}),
+										}}
+										placeholder="Picks up from..."
+										options={defaultPickUpFromOptions}
+										value={(data.canPickUp || []).map(valToOption)}
+										onChange={(selectedVal: any[]) => {
+											if (!selectedVal) {
+												updateField('canPickUp')(null)
+												return
+											}
+
+											const valueArr = selectedVal.map((item) => item.value)
+
+											updateField('canPickUp')(valueArr)
+										}}
+										isMulti
 									/>
 								</Box>
 							</div>
