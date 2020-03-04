@@ -25,15 +25,55 @@ The main objectives for the Phoenix Scout system are:
 
 ## Install
 
-This application consists of a frontend, backend, and database layer. For ease of setup and packaging, this project utilizes docker to manage each process.
+This application consists of a frontend, backend, and database layer. This project utilizes docker to manage each process.
+
+1. Duplicate and rename the sample `.env-example` file to `.env`.
+2. Install docker and docker-compose for your operating system.
+3. Run the following command
 
 ```sh
-docker-compose up -d
+> docker-compose up -d
 ```
 
-## Overall Software Architecture (Node.js Backend)
+4. Visit localhost:3000 in the web browser.
 
-The Node.js server is built with Composabilitity and Modularity in mind. The overarching goal is to design a server as a composition of logically separated modules. The rest of this readme will be focused around explaining the rationale for the separation of concerns chosen.
+## Overall Software Architecture
+
+### Technologies Used
+
+- React (utilizes React Hooks)
+- MongoDB
+- Node.js backend (Express framework)
+
+### Requirements
+
+### Offline Architecture
+
+The central requirement for this application is to enable seamless data entry/display irrespective of one's network connectivity -- If connection to the server is broken, one can still enter new data and see changes reflected immediately.
+
+Immediate data access drives the need to hold all data in memory. With data cached in memory, data access is possible irrespective of network connectivity. The problem to be solved is how to reconcile a possibly modified local cache of data with possibly modified data from the server.
+
+This is the problem of concurrency in a multi-user application, where applications such as Google Drive seek to reconcile a stream of data changes all happening at once.
+
+For the purposes of this application, it was determined that updates do not have to happen in real-time. For this reason, the proposed solution implemented in this application is to:
+
+1. Have data held in memory as the source of truth. Any updates to a preexisting document changes this in-memory data, and additionally adds the unique document key to a queue.
+2. When data is to be synced with the server, this queue is used to find documents that were changed locally, pushing the newest state of these documents to the server before draining this queue.
+
+This solution meets the requirement that the application provides a way to add/update existing data in an offline-first environment.
+
+This solution was implemented as follows:
+
+1. Client ([Link to Custom Hook](frontend/src/store/usePersistReducer.tsx))
+
+   - A custom React hook was written which manages the offline flow. A diagram of the hook architecture is shown below:
+
+   - ![Offline Flow](docs/offline-flow.jpeg)
+
+2. Server ([Link to Controller](server/src/controllers/matches.ts))
+   - The solution described requires that the backend exposes a GET/POST REST endpoint. The GET endpoint returns a dump of all data, where the POST endpoint accepts full document objects. New documents not already present in the database will be inserted into the database, while if a document ID is passed inside of the object, then MongoDB will try to modify an existing document accordingly.
+     <!-- 
+     The Node.js server is built with Composabilitity and Modularity in mind. The overarching goal is to design a server as a composition of logically separated modules. The rest of this readme will be focused around explaining the rationale for the separation of concerns chosen.
 
 ## General Module Architecture
 
@@ -189,4 +229,4 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+To learn React, check out the [React documentation](https://reactjs.org/). -->
