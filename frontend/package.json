@@ -31,7 +31,7 @@
     "react-table": "^7.0.0-rc.15",
     "styled-components": "^4.4.1",
     "typeface-roboto": "^0.0.75",
-    "yarn": "^1.21.1"
+    "yarn": "^1.22.0"
   },
   "scripts": {
     "webpack": "webpack",
