@@ -1,6 +1,6 @@
 # Phoenix Scout
 
-> An intuitive and powerful scouting solution for FRC robotics teams. A video demo can be found (here)[https://youtu.be/swM9t0lOC2w]
+> An intuitive and powerful scouting solution for FRC robotics teams. A video demo can be found [here](https://youtu.be/swM9t0lOC2w)
 
 ## Background
 
